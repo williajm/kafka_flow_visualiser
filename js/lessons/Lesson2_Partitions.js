@@ -309,6 +309,19 @@ export class Lesson2_Partitions extends Scene {
             }
         );
         this.addElement('legend-note-2', note2);
+
+        const note3 = this.createText(
+            'Gray messages = no key (round-robin distribution)',
+            x,
+            y + 103,
+            {
+                'font-size': '8',
+                'fill': '#64748B',
+                'text-anchor': 'start',
+                'font-style': 'italic'
+            }
+        );
+        this.addElement('legend-note-3', note3);
     }
 
     /**
@@ -444,10 +457,10 @@ export class Lesson2_Partitions extends Scene {
     createAnimationTimeline() {
         const timeline = this.animator.createTimeline({
             repeat: -1,
-            repeatDelay: 2
+            repeatDelay: 3
         });
 
-        // Keyed messages showing same key → same partition
+        // PHASE 1: Keyed messages (first 8 messages)
         const keyedSequence = [
             'user-A',  // P0 - seq 0
             'user-B',  // P1 - seq 0
@@ -460,29 +473,83 @@ export class Lesson2_Partitions extends Scene {
         ];
 
         keyedSequence.forEach((key, i) => {
-            const delay = i * 0.6;
+            const delay = i * 0.55;
+            // Add random jitter (±0.2s) to show cross-partition ordering issues
+            const jitter = (Math.random() - 0.5) * 0.4;
             timeline.add(() => {
-                this.createAndAnimateMessage(key);
-            }, delay);
+                this.createAndAnimateMessage(key, true);
+            }, delay + jitter);
         });
+
+        // Switch to round-robin mode
+        const switchTime = keyedSequence.length * 0.55 + 1.5;
+        timeline.add(() => {
+            this.switchMode('round-robin');
+        }, switchTime);
+
+        // PHASE 2: Round-robin messages (next 9 messages)
+        const roundRobinCount = 9;
+        for (let i = 0; i < roundRobinCount; i++) {
+            const delay = switchTime + 0.5 + (i * 0.55);
+            const jitter = (Math.random() - 0.5) * 0.4;
+            timeline.add(() => {
+                this.createAndAnimateMessage(null, false); // null = round-robin
+            }, delay + jitter);
+        }
+
+        // Switch back to keyed mode
+        const switchBackTime = switchTime + 0.5 + (roundRobinCount * 0.55) + 1.5;
+        timeline.add(() => {
+            this.switchMode('keyed');
+        }, switchBackTime);
 
         return timeline;
     }
 
     /**
-     * Create and animate message with key
+     * Switch between keyed and round-robin modes
+     * @param {string} mode - 'keyed' or 'round-robin'
      */
-    createAndAnimateMessage(key) {
+    switchMode(mode) {
+        this.mode = mode;
+
+        // Update mode indicator
+        const modeValueEl = this.getElement('mode-value');
+        if (modeValueEl) {
+            modeValueEl.textContent = mode === 'keyed' ? 'Key-Based Routing' : 'Round-Robin';
+            modeValueEl.setAttribute('fill', mode === 'keyed' ? '#60A5FA' : '#F59E0B');
+        }
+    }
+
+    /**
+     * Create and animate message with key or round-robin
+     * @param {string|null} key - Message key (or null for round-robin)
+     * @param {boolean} isKeyed - Whether this is keyed mode
+     */
+    createAndAnimateMessage(key, isKeyed = true) {
         const messageId = `message-${this.messageCount++}`;
         const producerPoint = this.producer.getEmitPoint();
 
-        // Determine partition
-        const partitionIndex = this.keyToPartition[key];
-        const messageColor = this.keyColors[key];
+        let partitionIndex;
+        let messageColor;
+
+        if (isKeyed && key) {
+            // Keyed mode: use key to determine partition
+            partitionIndex = this.keyToPartition[key];
+            messageColor = this.keyColors[key];
+        } else {
+            // Round-robin mode: distribute evenly
+            partitionIndex = this.roundRobinIndex;
+            this.roundRobinIndex = (this.roundRobinIndex + 1) % this.partitionCount;
+
+            // Use a neutral gray color for round-robin messages
+            messageColor = '#94A3B8';
+            key = `msg-${this.messageCount}`;
+        }
 
         // Get sequence number for this partition AND global number
         const seqNum = this.partitionSequence[partitionIndex]++;
-        const globalNum = ++this.globalMessageCount;
+        const globalNum = this.globalMessageCount++;
 
         // Create message
         const message = new Message(messageId, producerPoint.x, producerPoint.y);
@@ -497,8 +564,12 @@ export class Lesson2_Partitions extends Scene {
         });
 
         // Add key label
+        const displayKey = isKeyed && key.includes('user-')
+            ? key.split('-')[1]  // "A", "B", "C"
+            : `M${globalNum}`;    // "M1", "M2", etc. for round-robin
+
         const keyLabel = this.createText(
-            key.split('-')[1], // "A", "B", "C"
+            displayKey,
             0,
             -1,
             {
@@ -579,7 +650,8 @@ export class Lesson2_Partitions extends Scene {
             ease: 'power2.in',
             onStart: () => {
                 // Update consumer history when message is consumed
-                this.updateConsumerHistory(partitionIndex, key, seqNum, globalNum, messageColor);
+                const displayKey = isKeyed && key.includes('user-') ? key : `M${globalNum}`;
+                this.updateConsumerHistory(partitionIndex, displayKey, seqNum, globalNum, messageColor);
             }
         });
     }
