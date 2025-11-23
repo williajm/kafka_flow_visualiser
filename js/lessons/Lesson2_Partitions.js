@@ -32,6 +32,10 @@ export class Lesson2_Partitions extends Scene {
         // Track sequence numbers per partition
         this.partitionSequence = [0, 0, 0];
 
+        // Track message history per consumer (for display)
+        this.consumerHistory = [[], [], []];
+        this.maxHistorySize = 3;
+
         // Two modes: 'keyed' and 'round-robin'
         this.mode = 'keyed';
         this.roundRobinIndex = 0;
@@ -93,6 +97,7 @@ export class Lesson2_Partitions extends Scene {
         this.addLabels();
         this.addModeIndicator();
         this.addLegend();
+        this.addConsumerHistoryDisplays();
         this.setupClickHandlers();
 
         // Create animation timeline
@@ -291,6 +296,96 @@ export class Lesson2_Partitions extends Scene {
     }
 
     /**
+     * Add consumer history displays
+     */
+    addConsumerHistoryDisplays() {
+        this.consumers.forEach((consumer, i) => {
+            const historyX = consumer.x + consumer.width + 35;
+            const historyY = consumer.y - 10;
+
+            // History box background
+            const historyBox = this.createRect(historyX, historyY, 110, 90, {
+                fill: '#141B3D',
+                stroke: '#2D3561',
+                'stroke-width': 1,
+                rx: 6,
+                opacity: 0.8
+            });
+            this.addElement(`consumer-${i}-history-box`, historyBox);
+
+            // Title
+            const title = this.createText(
+                'Recently consumed:',
+                historyX + 55,
+                historyY + 15,
+                {
+                    'font-size': '9',
+                    'fill': '#94A3B8',
+                    'text-anchor': 'middle'
+                }
+            );
+            this.addElement(`consumer-${i}-history-title`, title);
+
+            // Placeholder for messages (will be updated dynamically)
+            for (let j = 0; j < this.maxHistorySize; j++) {
+                const msgY = historyY + 33 + (j * 18);
+
+                const msgText = this.createText(
+                    '—',
+                    historyX + 55,
+                    msgY,
+                    {
+                        'font-size': '11',
+                        'fill': '#64748B',
+                        'text-anchor': 'middle',
+                        'font-family': 'monospace'
+                    }
+                );
+                this.addElement(`consumer-${i}-history-msg-${j}`, msgText);
+            }
+        });
+    }
+
+    /**
+     * Update consumer history display
+     * @param {number} consumerIndex
+     * @param {string} key
+     * @param {number} seqNum
+     * @param {string} color
+     */
+    updateConsumerHistory(consumerIndex, key, seqNum, color) {
+        const history = this.consumerHistory[consumerIndex];
+
+        // Add new message to history
+        history.push({ key, seqNum, color });
+
+        // Keep only last N messages
+        if (history.length > this.maxHistorySize) {
+            history.shift();
+        }
+
+        // Update display
+        const historyX = this.consumers[consumerIndex].x + this.consumers[consumerIndex].width + 35;
+        const historyY = this.consumers[consumerIndex].y - 10;
+
+        for (let j = 0; j < this.maxHistorySize; j++) {
+            const msgElement = this.getElement(`consumer-${consumerIndex}-history-msg-${j}`);
+            if (msgElement) {
+                if (j < history.length) {
+                    const msg = history[j];
+                    msgElement.textContent = `${msg.key.split('-')[1]} #${msg.seqNum}`;
+                    msgElement.setAttribute('fill', msg.color);
+                    msgElement.setAttribute('opacity', '1');
+                } else {
+                    msgElement.textContent = '—';
+                    msgElement.setAttribute('fill', '#64748B');
+                    msgElement.setAttribute('opacity', '0.5');
+                }
+            }
+        }
+    }
+
+    /**
      * Setup click handlers
      */
     setupClickHandlers() {
@@ -462,7 +557,11 @@ export class Lesson2_Partitions extends Scene {
             duration: 0.3,
             scale: 0,
             opacity: 0,
-            ease: 'power2.in'
+            ease: 'power2.in',
+            onStart: () => {
+                // Update consumer history when message is consumed
+                this.updateConsumerHistory(partitionIndex, key, seqNum, messageColor);
+            }
         });
     }
 
@@ -473,6 +572,7 @@ export class Lesson2_Partitions extends Scene {
         this.messages = [];
         this.messageCount = 0;
         this.partitionSequence = [0, 0, 0];
+        this.consumerHistory = [[], [], []];
         super.destroy();
     }
 }
