@@ -9,6 +9,7 @@ import { InfoPanel } from './ui/InfoPanel.js';
 import { Navigation } from './ui/Navigation.js';
 import { Lesson1_Basics } from './lessons/Lesson1_Basics.js';
 import { Lesson2_Partitions } from './lessons/Lesson2_Partitions.js';
+import { Broker } from './kafka/Broker.js';
 
 class KafkaFlowVisualizer {
     constructor() {

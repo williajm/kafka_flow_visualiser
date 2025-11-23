@@ -1,12 +1,16 @@
 /**
- * Lesson 2: Partitions
- * Demonstrates how messages with keys go to specific partitions
- * Shows ordering guarantees within partitions and parallel consumer processing
+ * Lesson 2: Partitions (Comprehensive)
+ * Demonstrates:
+ * - Partitions distributed across brokers
+ * - Ordering within partitions (sequence numbers)
+ * - No ordering across partitions
+ * - Key-based routing (hash) vs round-robin
+ * - Parallel consumption
  */
 
 import { Scene } from '../core/Scene.js';
 import { Producer } from '../kafka/Producer.js';
-import { Topic } from '../kafka/Topic.js';
+import { Broker } from '../kafka/Broker.js';
 import { Consumer } from '../kafka/Consumer.js';
 import { Message } from '../kafka/Message.js';
 import { eventBus } from '../core/EventBus.js';
@@ -14,185 +18,221 @@ import { eventBus } from '../core/EventBus.js';
 export class Lesson2_Partitions extends Scene {
     constructor(canvas) {
         super(canvas, {
-            title: 'Partitions & Keys',
-            description: 'Messages with the same key always go to the same partition, preserving order. Multiple consumers process partitions in parallel for scalability.'
+            title: 'Kafka Partitions Explained',
+            description: 'Partitions divide topics across brokers for scalability. Messages with keys maintain order within partitions. Messages without keys distribute round-robin.'
         });
 
         this.producer = null;
-        this.topic = null;
+        this.brokers = [];
         this.consumers = [];
         this.messages = [];
         this.messageCount = 0;
         this.partitionCount = 3;
 
-        // Define message keys and their assigned partitions (simulating hash % 3)
+        // Track sequence numbers per partition
+        this.partitionSequence = [0, 0, 0];
+
+        // Two modes: 'keyed' and 'round-robin'
+        this.mode = 'keyed';
+        this.roundRobinIndex = 0;
+
+        // Key mappings for keyed mode
         this.keyToPartition = {
-            'user-A': 0,  // Color: cyan
-            'user-B': 1,  // Color: yellow
-            'user-C': 2   // Color: pink
+            'user-A': 0,
+            'user-B': 1,
+            'user-C': 2
         };
 
         this.keyColors = {
             'user-A': '#22D3EE',  // Cyan
-            'user-B': '#FBBF24',  // Yellow/amber
+            'user-B': '#FBBF24',  // Yellow
             'user-C': '#F472B6'   // Pink
         };
     }
 
     /**
-     * Setup the scene - create and position all entities
+     * Setup the scene
      */
     async setup() {
-        // Create entities - topic has 3 partitions, 3 consumers (one per partition)
-        this.producer = new Producer('producer-1', 100, 260);
-        this.topic = new Topic('topic-1', 480, 200, this.partitionCount);
+        // Producer on the left
+        this.producer = new Producer('producer-1', 80, 230);
 
-        // Create 3 consumers, vertically stacked
-        const consumerStartY = 180;
-        const consumerSpacing = 80;
+        // Three brokers in the middle (vertically stacked to show distribution)
+        const brokerX = 380;
+        const brokerStartY = 120;
+        const brokerSpacing = 110;
+
         for (let i = 0; i < this.partitionCount; i++) {
-            const consumer = new Consumer(`consumer-${i}`, 950, consumerStartY + (i * consumerSpacing), `consumer-group-1`);
+            const broker = new Broker(`broker-${i}`, brokerX, brokerStartY + (i * brokerSpacing), i);
+            this.brokers.push(broker);
+        }
+
+        // Three consumers on the right
+        const consumerX = 900;
+        const consumerStartY = 150;
+        const consumerSpacing = 110;
+
+        for (let i = 0; i < this.partitionCount; i++) {
+            const consumer = new Consumer(`consumer-${i}`, consumerX, consumerStartY + (i * consumerSpacing), 'consumer-group-1');
             this.consumers.push(consumer);
         }
 
-        // Render producer and topic
-        const producerEl = this.producer.render();
-        const topicEl = this.topic.render();
+        // Render everything
+        this.addElement('producer', this.producer.render());
 
-        this.addElement('producer', producerEl);
-        this.addElement('topic', topicEl);
-
-        // Render consumers
-        this.consumers.forEach((consumer, i) => {
-            const consumerEl = consumer.render();
-            this.addElement(`consumer-${i}`, consumerEl);
+        this.brokers.forEach((broker, i) => {
+            this.addElement(`broker-${i}`, broker.render());
         });
 
-        // Add click handlers for info panel
-        this.setupClickHandlers();
+        this.consumers.forEach((consumer, i) => {
+            this.addElement(`consumer-${i}`, consumer.render());
+        });
 
-        // Create connection lines
+        // Add visual elements
         this.createConnectionLines();
-
-        // Add partition labels
-        this.addPartitionLabels();
-
-        // Add consumer labels
-        this.addConsumerLabels();
-
-        // Add key legend
-        this.addKeyLegend();
+        this.addLabels();
+        this.addModeIndicator();
+        this.addLegend();
+        this.setupClickHandlers();
 
         // Create animation timeline
         this.createAnimationTimeline();
     }
 
     /**
-     * Create visual connection lines between components
+     * Create connection lines
      */
     createConnectionLines() {
         const producerPoint = this.producer.getEmitPoint();
-        const topicReceivePoint = this.topic.getReceivePoint();
-        const topicEmitPoint = this.topic.getEmitPoint();
 
-        // Producer → Topic line
-        const line1 = this.createLine(
-            producerPoint.x,
-            producerPoint.y,
-            topicReceivePoint.x,
-            topicReceivePoint.y + 50,
-            {
-                stroke: '#2D3561',
-                'stroke-width': 2,
-                'stroke-dasharray': '5,5',
-                opacity: 0.5
-            }
-        );
-        this.addElement('line-producer-topic', line1);
-
-        // Topic → Consumer lines (one per partition)
-        this.consumers.forEach((consumer, i) => {
-            const partitionY = this.getPartitionY(i);
-            const consumerPoint = consumer.getReceivePoint();
-
+        // Producer → Brokers (fanned out)
+        this.brokers.forEach((broker, i) => {
+            const brokerPoint = broker.getReceivePoint();
             const line = this.createLine(
-                topicEmitPoint.x,
-                partitionY,
+                producerPoint.x,
+                producerPoint.y,
+                brokerPoint.x,
+                brokerPoint.y,
+                {
+                    stroke: '#2D3561',
+                    'stroke-width': 1,
+                    'stroke-dasharray': '3,3',
+                    opacity: 0.4
+                }
+            );
+            this.addElement(`line-producer-broker-${i}`, line);
+        });
+
+        // Brokers → Consumers (one-to-one)
+        this.brokers.forEach((broker, i) => {
+            const brokerPoint = broker.getEmitPoint();
+            const consumerPoint = this.consumers[i].getReceivePoint();
+            const line = this.createLine(
+                brokerPoint.x,
+                brokerPoint.y,
                 consumerPoint.x,
                 consumerPoint.y,
                 {
                     stroke: '#2D3561',
-                    'stroke-width': 2,
-                    'stroke-dasharray': '5,5',
-                    opacity: 0.5
+                    'stroke-width': 1,
+                    'stroke-dasharray': '3,3',
+                    opacity: 0.4
                 }
             );
-            this.addElement(`line-topic-consumer-${i}`, line);
+            this.addElement(`line-broker-consumer-${i}`, line);
         });
     }
 
     /**
-     * Add partition labels
+     * Add labels
      */
-    addPartitionLabels() {
-        const partitionHeight = 25;
-        const gap = 5;
-        const totalHeight = (partitionHeight * this.partitionCount) + (gap * (this.partitionCount - 1));
-        const startY = this.topic.y + (this.topic.height - totalHeight) / 2;
-
-        for (let i = 0; i < this.partitionCount; i++) {
-            const partitionY = startY + (i * (partitionHeight + gap));
-
-            const label = this.createText(
-                `P${i}`,
-                this.topic.x - 20,
-                partitionY + partitionHeight / 2 + 5,
-                {
-                    'font-size': '12',
-                    'font-weight': '600',
-                    'fill': '#22D3EE',
-                    'text-anchor': 'end'
-                }
-            );
-
-            this.addElement(`partition-label-${i}`, label);
-        }
-    }
-
-    /**
-     * Add consumer labels
-     */
-    addConsumerLabels() {
+    addLabels() {
+        // Consumer labels
         this.consumers.forEach((consumer, i) => {
-            const consumerPoint = consumer.getReceivePoint();
+            const point = consumer.getReceivePoint();
             const label = this.createText(
                 `C${i}`,
-                consumerPoint.x + consumer.width + 25,
-                consumerPoint.y + 5,
+                point.x + consumer.width + 20,
+                point.y + 5,
                 {
                     'font-size': '12',
                     'font-weight': '600',
-                    'fill': '#34D399',
-                    'text-anchor': 'start'
+                    'fill': '#34D399'
                 }
             );
             this.addElement(`consumer-label-${i}`, label);
         });
+
+        // Title
+        const title = this.createText(
+            'Distributed Partitions Across Brokers',
+            600,
+            50,
+            {
+                'font-size': '14',
+                'font-weight': '600',
+                'fill': '#E2E8F0',
+                'text-anchor': 'middle'
+            }
+        );
+        this.addElement('title', title);
     }
 
     /**
-     * Add key legend explaining message colors
+     * Add mode indicator
      */
-    addKeyLegend() {
-        const legendX = 80;
-        const legendY = 80;
+    addModeIndicator() {
+        const x = 80;
+        const y = 520;
 
+        const modeBox = this.createRect(x, y, 200, 60, {
+            fill: '#141B3D',
+            stroke: '#2D3561',
+            'stroke-width': 1,
+            rx: 8
+        });
+        this.addElement('mode-box', modeBox);
+
+        const modeTitle = this.createText(
+            'Current Mode:',
+            x + 100,
+            y + 20,
+            {
+                'font-size': '11',
+                'fill': '#94A3B8',
+                'text-anchor': 'middle'
+            }
+        );
+        this.addElement('mode-title', modeTitle);
+
+        const modeValue = this.createText(
+            'Key-Based Routing',
+            x + 100,
+            y + 40,
+            {
+                'font-size': '13',
+                'font-weight': '700',
+                'fill': '#60A5FA',
+                'text-anchor': 'middle'
+            }
+        );
+        this.addElement('mode-value', modeValue);
+    }
+
+    /**
+     * Add legend
+     */
+    addLegend() {
+        const x = 80;
+        const y = 80;
+
+        // Keyed mode legend
         const title = this.createText(
             'Message Keys:',
-            legendX,
-            legendY,
+            x,
+            y,
             {
-                'font-size': '12',
+                'font-size': '11',
                 'font-weight': '600',
                 'fill': '#E2E8F0',
                 'text-anchor': 'start'
@@ -201,74 +241,83 @@ export class Lesson2_Partitions extends Scene {
         this.addElement('legend-title', title);
 
         Object.entries(this.keyColors).forEach(([key, color], i) => {
-            const y = legendY + 20 + (i * 20);
+            const yPos = y + 18 + (i * 18);
 
-            // Color circle
-            const circle = this.createCircle(legendX + 6, y, 5, {
+            const circle = this.createCircle(x + 5, yPos, 4, {
                 fill: color,
                 opacity: 0.9
             });
             this.addElement(`legend-circle-${key}`, circle);
 
-            // Key label
             const label = this.createText(
                 key,
-                legendX + 18,
-                y + 4,
+                x + 15,
+                yPos + 4,
                 {
-                    'font-size': '11',
+                    'font-size': '10',
                     'fill': '#94A3B8',
                     'text-anchor': 'start'
                 }
             );
             this.addElement(`legend-label-${key}`, label);
 
-            // Partition assignment
             const partition = this.keyToPartition[key];
-            const partitionLabel = this.createText(
+            const partLabel = this.createText(
                 `→ P${partition}`,
-                legendX + 72,
-                y + 4,
+                x + 65,
+                yPos + 4,
                 {
-                    'font-size': '11',
+                    'font-size': '10',
                     'fill': '#22D3EE',
                     'text-anchor': 'start'
                 }
             );
-            this.addElement(`legend-partition-${key}`, partitionLabel);
+            this.addElement(`legend-part-${key}`, partLabel);
         });
+
+        // Explanation note
+        const note = this.createText(
+            'Watch: Same key → same partition → ordered!',
+            x,
+            y + 75,
+            {
+                'font-size': '9',
+                'fill': '#64748B',
+                'text-anchor': 'start',
+                'font-style': 'italic'
+            }
+        );
+        this.addElement('legend-note', note);
     }
 
     /**
-     * Setup click handlers for entities
+     * Setup click handlers
      */
     setupClickHandlers() {
         const producerEl = this.getElement('producer');
-        const topicEl = this.getElement('topic');
-
         if (producerEl) {
             producerEl.addEventListener('click', () => {
                 const info = this.producer.getInfo();
-                info.description += ' Messages are sent with keys (user-A, user-B, user-C). Same key always goes to the same partition.';
+                info.description += ` In key-based mode, the producer hashes the message key to determine the target partition. In round-robin mode, messages distribute evenly.`;
                 eventBus.emit('entity:click', info);
             });
         }
 
-        if (topicEl) {
-            topicEl.addEventListener('click', () => {
-                const info = this.topic.getInfo();
-                info.description += ' Keys are hashed to determine partition: hash(key) % 3. This ensures all messages for a user stay in order.';
-                eventBus.emit('entity:click', info);
-            });
-        }
+        this.brokers.forEach((broker, i) => {
+            const brokerEl = this.getElement(`broker-${i}`);
+            if (brokerEl) {
+                brokerEl.addEventListener('click', () => {
+                    eventBus.emit('entity:click', broker.getInfo());
+                });
+            }
+        });
 
-        // Consumer click handlers
         this.consumers.forEach((consumer, i) => {
             const consumerEl = this.getElement(`consumer-${i}`);
             if (consumerEl) {
                 consumerEl.addEventListener('click', () => {
                     const info = consumer.getInfo();
-                    info.description = `Consumer ${i} reads exclusively from Partition ${i}. Multiple consumers enable parallel processing while maintaining per-key ordering.`;
+                    info.description = `Consumer ${i} reads only from Partition ${i}. Multiple consumers enable parallel processing for high throughput.`;
                     info.details['Assigned Partition'] = `P${i}`;
                     eventBus.emit('entity:click', info);
                 });
@@ -277,29 +326,28 @@ export class Lesson2_Partitions extends Scene {
     }
 
     /**
-     * Create the animation timeline
+     * Create animation timeline
      */
     createAnimationTimeline() {
         const timeline = this.animator.createTimeline({
             repeat: -1,
-            repeatDelay: 1.5
+            repeatDelay: 2
         });
 
-        // Create messages with specific keys showing same key → same partition
-        const messageSequence = [
-            'user-A',  // → P0
-            'user-B',  // → P1
-            'user-C',  // → P2
-            'user-A',  // → P0 (same partition as first user-A)
-            'user-B',  // → P1 (same partition as first user-B)
-            'user-A',  // → P0 (demonstrates ordering within partition)
-            'user-C',  // → P2
-            'user-B',  // → P1
-            'user-C',  // → P2
+        // Keyed messages showing same key → same partition
+        const keyedSequence = [
+            'user-A',  // P0 - seq 0
+            'user-B',  // P1 - seq 0
+            'user-C',  // P2 - seq 0
+            'user-A',  // P0 - seq 1 (shows ordering!)
+            'user-B',  // P1 - seq 1
+            'user-A',  // P0 - seq 2 (3 in a row to same partition!)
+            'user-C',  // P2 - seq 1
+            'user-B',  // P1 - seq 2
         ];
 
-        messageSequence.forEach((key, i) => {
-            const delay = i * 0.7;
+        keyedSequence.forEach((key, i) => {
+            const delay = i * 0.6;
             timeline.add(() => {
                 this.createAndAnimateMessage(key);
             }, delay);
@@ -309,36 +357,24 @@ export class Lesson2_Partitions extends Scene {
     }
 
     /**
-     * Get partition Y coordinate
-     * @param {number} partitionIndex
-     * @returns {number}
-     */
-    getPartitionY(partitionIndex) {
-        const partitionHeight = 25;
-        const gap = 5;
-        const totalHeight = (partitionHeight * this.partitionCount) + (gap * (this.partitionCount - 1));
-        const startY = this.topic.y + (this.topic.height - totalHeight) / 2;
-
-        return startY + (partitionIndex * (partitionHeight + gap)) + partitionHeight / 2;
-    }
-
-    /**
-     * Create and animate a single message with a specific key
-     * @param {string} key - Message key (user-A, user-B, or user-C)
+     * Create and animate message with key
      */
     createAndAnimateMessage(key) {
         const messageId = `message-${this.messageCount++}`;
         const producerPoint = this.producer.getEmitPoint();
 
-        // Determine partition based on key
+        // Determine partition
         const partitionIndex = this.keyToPartition[key];
         const messageColor = this.keyColors[key];
 
-        // Create colored message at producer
+        // Get sequence number for this partition
+        const seqNum = this.partitionSequence[partitionIndex]++;
+
+        // Create message
         const message = new Message(messageId, producerPoint.x, producerPoint.y);
         const messageEl = message.render();
 
-        // Change message color based on key
+        // Color the message
         const circles = messageEl.querySelectorAll('circle');
         circles.forEach(circle => {
             if (circle.getAttribute('fill') === '#FBBF24') {
@@ -346,13 +382,13 @@ export class Lesson2_Partitions extends Scene {
             }
         });
 
-        // Add key label to message
+        // Add key label
         const keyLabel = this.createText(
-            key.split('-')[1], // Just "A", "B", or "C"
+            key.split('-')[1], // "A", "B", "C"
             0,
-            0,
+            -1,
             {
-                'font-size': '9',
+                'font-size': '8',
                 'font-weight': '700',
                 'fill': '#0A0E27',
                 'text-anchor': 'middle'
@@ -360,64 +396,70 @@ export class Lesson2_Partitions extends Scene {
         );
         messageEl.appendChild(keyLabel);
 
+        // Add sequence number
+        const seqLabel = this.createText(
+            `#${seqNum}`,
+            0,
+            5,
+            {
+                'font-size': '7',
+                'font-weight': '600',
+                'fill': '#0A0E27',
+                'text-anchor': 'middle'
+            }
+        );
+        messageEl.appendChild(seqLabel);
+
         this.addElement(messageId, messageEl);
         this.messages.push(message);
 
-        // Animation sequence
+        // Animate
+        const broker = this.brokers[partitionIndex];
+        const consumer = this.consumers[partitionIndex];
+
+        const brokerCenter = broker.getPartitionCenter();
+        const consumerPoint = consumer.getReceivePoint();
+
         const tl = gsap.timeline({
             onComplete: () => {
-                // Remove message after animation
                 this.removeElement(messageId);
                 const index = this.messages.indexOf(message);
-                if (index > -1) {
-                    this.messages.splice(index, 1);
-                }
+                if (index > -1) this.messages.splice(index, 1);
             }
         });
 
-        const topicReceivePoint = this.topic.getReceivePoint();
-        const topicEmitPoint = this.topic.getEmitPoint();
-        const consumer = this.consumers[partitionIndex];
-        const consumerPoint = consumer.getReceivePoint();
-
-        // Calculate partition-specific Y coordinate
-        const partitionY = this.getPartitionY(partitionIndex);
-
-        // Producer → Topic (enter at partition level)
+        // Producer → Broker/Partition
         tl.to(messageEl, {
-            duration: 0.8,
-            x: topicReceivePoint.x,
-            y: partitionY,
+            duration: 0.7,
+            x: brokerCenter.x,
+            y: brokerCenter.y,
             ease: 'power1.inOut'
         });
 
-        // Pause at partition (storage)
+        // Pause at partition
         tl.to(messageEl, {
-            duration: 0.3,
-            scale: 0.8,
-            opacity: 0.7
+            duration: 0.2,
+            scale: 0.9,
+            opacity: 0.8
         });
 
-        // Move across the partition
         tl.to(messageEl, {
-            duration: 0.4,
+            duration: 0.2,
             scale: 1,
-            opacity: 1,
-            x: topicEmitPoint.x,
-            y: partitionY
+            opacity: 1
         });
 
-        // Partition → Consumer (specific consumer for this partition)
+        // Partition → Consumer
         tl.to(messageEl, {
-            duration: 0.8,
+            duration: 0.7,
             x: consumerPoint.x,
             y: consumerPoint.y,
             ease: 'power1.inOut'
         });
 
-        // Consume (fade out)
+        // Consume
         tl.to(messageEl, {
-            duration: 0.4,
+            duration: 0.3,
             scale: 0,
             opacity: 0,
             ease: 'power2.in'
@@ -430,6 +472,7 @@ export class Lesson2_Partitions extends Scene {
     destroy() {
         this.messages = [];
         this.messageCount = 0;
+        this.partitionSequence = [0, 0, 0];
         super.destroy();
     }
 }
