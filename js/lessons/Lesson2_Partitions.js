@@ -32,6 +32,9 @@ export class Lesson2_Partitions extends Scene {
         // Track sequence numbers per partition
         this.partitionSequence = [0, 0, 0];
 
+        // Track GLOBAL message order (to show cross-partition ordering doesn't matter)
+        this.globalMessageCount = 0;
+
         // Track message history per consumer (for display)
         this.consumerHistory = [[], [], []];
         this.maxHistorySize = 3;
@@ -281,7 +284,7 @@ export class Lesson2_Partitions extends Scene {
         });
 
         // Explanation note
-        const note = this.createText(
+        const note1 = this.createText(
             'Watch: Same key → same partition → ordered!',
             x,
             y + 75,
@@ -292,7 +295,20 @@ export class Lesson2_Partitions extends Scene {
                 'font-style': 'italic'
             }
         );
-        this.addElement('legend-note', note);
+        this.addElement('legend-note-1', note1);
+
+        const note2 = this.createText(
+            'Numbers in ( ) = global order - may be out of sequence!',
+            x,
+            y + 90,
+            {
+                'font-size': '8',
+                'fill': '#64748B',
+                'text-anchor': 'start',
+                'font-style': 'italic'
+            }
+        );
+        this.addElement('legend-note-2', note2);
     }
 
     /**
@@ -304,7 +320,7 @@ export class Lesson2_Partitions extends Scene {
             const historyY = consumer.y - 10;
 
             // History box background
-            const historyBox = this.createRect(historyX, historyY, 110, 90, {
+            const historyBox = this.createRect(historyX, historyY, 130, 90, {
                 fill: '#141B3D',
                 stroke: '#2D3561',
                 'stroke-width': 1,
@@ -315,8 +331,8 @@ export class Lesson2_Partitions extends Scene {
 
             // Title
             const title = this.createText(
-                'Recently consumed:',
-                historyX + 55,
+                'Consumed (partition order):',
+                historyX + 65,
                 historyY + 15,
                 {
                     'font-size': '9',
@@ -332,10 +348,10 @@ export class Lesson2_Partitions extends Scene {
 
                 const msgText = this.createText(
                     '—',
-                    historyX + 55,
+                    historyX + 65,
                     msgY,
                     {
-                        'font-size': '11',
+                        'font-size': '10',
                         'fill': '#64748B',
                         'text-anchor': 'middle',
                         'font-family': 'monospace'
@@ -351,13 +367,14 @@ export class Lesson2_Partitions extends Scene {
      * @param {number} consumerIndex
      * @param {string} key
      * @param {number} seqNum
+     * @param {number} globalNum
      * @param {string} color
      */
-    updateConsumerHistory(consumerIndex, key, seqNum, color) {
+    updateConsumerHistory(consumerIndex, key, seqNum, globalNum, color) {
         const history = this.consumerHistory[consumerIndex];
 
         // Add new message to history
-        history.push({ key, seqNum, color });
+        history.push({ key, seqNum, globalNum, color });
 
         // Keep only last N messages
         if (history.length > this.maxHistorySize) {
@@ -373,7 +390,8 @@ export class Lesson2_Partitions extends Scene {
             if (msgElement) {
                 if (j < history.length) {
                     const msg = history[j];
-                    msgElement.textContent = `${msg.key.split('-')[1]} #${msg.seqNum}`;
+                    // Show: "A #1 (msg 4)" - partition order + global order
+                    msgElement.textContent = `${msg.key.split('-')[1]} #${msg.seqNum} (${msg.globalNum})`;
                     msgElement.setAttribute('fill', msg.color);
                     msgElement.setAttribute('opacity', '1');
                 } else {
@@ -462,8 +480,9 @@ export class Lesson2_Partitions extends Scene {
         const partitionIndex = this.keyToPartition[key];
         const messageColor = this.keyColors[key];
 
-        // Get sequence number for this partition
+        // Get sequence number for this partition AND global number
         const seqNum = this.partitionSequence[partitionIndex]++;
+        const globalNum = ++this.globalMessageCount;
 
         // Create message
         const message = new Message(messageId, producerPoint.x, producerPoint.y);
@@ -560,7 +579,7 @@ export class Lesson2_Partitions extends Scene {
             ease: 'power2.in',
             onStart: () => {
                 // Update consumer history when message is consumed
-                this.updateConsumerHistory(partitionIndex, key, seqNum, messageColor);
+                this.updateConsumerHistory(partitionIndex, key, seqNum, globalNum, messageColor);
             }
         });
     }
@@ -572,6 +591,7 @@ export class Lesson2_Partitions extends Scene {
         this.messages = [];
         this.messageCount = 0;
         this.partitionSequence = [0, 0, 0];
+        this.globalMessageCount = 0;
         this.consumerHistory = [[], [], []];
         super.destroy();
     }
