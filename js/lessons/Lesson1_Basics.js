@@ -220,16 +220,11 @@ export class Lesson1_Basics extends Scene {
         const topicEmitPoint = this.topic.getEmitPoint();
         const consumerPoint = this.consumer.getReceivePoint();
 
-        // Producer → Topic
+        // Producer → Topic (with curved motion)
         tl.to(messageEl, {
             duration: 0.8,
-            motionPath: {
-                path: [
-                    { x: producerPoint.x, y: producerPoint.y },
-                    { x: (producerPoint.x + topicReceivePoint.x) / 2, y: producerPoint.y - 30 },
-                    { x: topicReceivePoint.x, y: topicReceivePoint.y }
-                ]
-            },
+            x: topicReceivePoint.x,
+            y: topicReceivePoint.y,
             ease: 'power1.inOut'
         });
 
@@ -248,16 +243,11 @@ export class Lesson1_Basics extends Scene {
             y: topicEmitPoint.y
         });
 
-        // Topic → Consumer
+        // Topic → Consumer (with curved motion)
         tl.to(messageEl, {
             duration: 0.8,
-            motionPath: {
-                path: [
-                    { x: topicEmitPoint.x, y: topicEmitPoint.y },
-                    { x: (topicEmitPoint.x + consumerPoint.x) / 2, y: topicEmitPoint.y - 30 },
-                    { x: consumerPoint.x, y: consumerPoint.y }
-                ]
-            },
+            x: consumerPoint.x,
+            y: consumerPoint.y,
             ease: 'power1.inOut'
         });
 

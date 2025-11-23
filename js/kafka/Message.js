@@ -21,35 +21,37 @@ export class Message {
         group.setAttribute('class', 'message');
         group.setAttribute('data-entity', 'message');
         group.setAttribute('data-id', this.id);
+        // Position the group at the initial coordinates
+        group.setAttribute('transform', `translate(${this.x}, ${this.y})`);
 
-        // Outer glow circle
+        // Outer glow circle - centered at (0, 0) relative to group
         const glow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        glow.setAttribute('cx', this.x);
-        glow.setAttribute('cy', this.y);
+        glow.setAttribute('cx', 0);
+        glow.setAttribute('cy', 0);
         glow.setAttribute('r', this.radius + 4);
         glow.setAttribute('fill', '#FBBF24');
         glow.setAttribute('opacity', '0.3');
 
-        // Main message circle
+        // Main message circle - centered at (0, 0) relative to group
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', this.x);
-        circle.setAttribute('cy', this.y);
+        circle.setAttribute('cx', 0);
+        circle.setAttribute('cy', 0);
         circle.setAttribute('r', this.radius);
         circle.setAttribute('fill', '#FBBF24');
         circle.setAttribute('opacity', '1');
 
         // Inner highlight
         const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        highlight.setAttribute('cx', this.x - 2);
-        highlight.setAttribute('cy', this.y - 2);
+        highlight.setAttribute('cx', -2);
+        highlight.setAttribute('cy', -2);
         highlight.setAttribute('r', 3);
         highlight.setAttribute('fill', '#FDE68A');
         highlight.setAttribute('opacity', '0.8');
 
         // Shadow for depth
         const shadow = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-        shadow.setAttribute('cx', this.x);
-        shadow.setAttribute('cy', this.y + this.radius + 3);
+        shadow.setAttribute('cx', 0);
+        shadow.setAttribute('cy', this.radius + 3);
         shadow.setAttribute('rx', this.radius - 2);
         shadow.setAttribute('ry', 2);
         shadow.setAttribute('fill', '#000000');
@@ -74,18 +76,8 @@ export class Message {
         this.y = y;
 
         if (this.element) {
-            // Update all child elements
-            const children = this.element.children;
-            for (let child of children) {
-                if (child.tagName === 'circle' || child.tagName === 'ellipse') {
-                    if (child.getAttribute('cx')) {
-                        child.setAttribute('cx', x);
-                    }
-                    if (child.getAttribute('cy')) {
-                        child.setAttribute('cy', y);
-                    }
-                }
-            }
+            // Update the group's transform to move the message
+            this.element.setAttribute('transform', `translate(${x}, ${y})`);
         }
     }
 
