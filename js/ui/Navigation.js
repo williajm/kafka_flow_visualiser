@@ -11,7 +11,7 @@ export class Navigation {
         this.lessonList = document.getElementById('lessonList');
         this.toggleBtn = document.getElementById('sidebarToggle');
         this.currentLesson = 'basics';
-        this.unlockedLessons = new Set(['basics']); // Start with only basics unlocked
+        this.unlockedLessons = new Set(['basics', 'partitions']); // Unlock first two lessons
 
         this.init();
     }
@@ -20,6 +20,14 @@ export class Navigation {
      * Initialize event listeners
      */
     init() {
+        // Unlock lessons in the UI
+        this.unlockedLessons.forEach(lessonId => {
+            const lessonItem = this.lessonList.querySelector(`[data-lesson="${lessonId}"]`);
+            if (lessonItem) {
+                lessonItem.classList.remove('locked');
+            }
+        });
+
         // Toggle sidebar
         this.toggleBtn.addEventListener('click', () => {
             this.toggleSidebar();

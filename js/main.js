@@ -8,6 +8,7 @@ import { Controls } from './ui/Controls.js';
 import { InfoPanel } from './ui/InfoPanel.js';
 import { Navigation } from './ui/Navigation.js';
 import { Lesson1_Basics } from './lessons/Lesson1_Basics.js';
+import { Lesson2_Partitions } from './lessons/Lesson2_Partitions.js';
 
 class KafkaFlowVisualizer {
     constructor() {
@@ -44,8 +45,8 @@ class KafkaFlowVisualizer {
      */
     registerLessons() {
         this.lessons.set('basics', Lesson1_Basics);
+        this.lessons.set('partitions', Lesson2_Partitions);
         // More lessons will be added here:
-        // this.lessons.set('partitions', Lesson2_Partitions);
         // this.lessons.set('consumer-groups', Lesson3_ConsumerGroups);
         // etc.
     }
