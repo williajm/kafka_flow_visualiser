@@ -416,15 +416,29 @@ export class Lesson6_Rebalancing extends Scene {
      * In real Kafka: consumer joins/leaves first, THEN rebalancing happens
      */
     async rebalance(newConsumerCount) {
+        const isJoin = newConsumerCount > this.activeConsumerCount;
+
         // Step 1: Consumer joins/leaves the group (membership change)
         if (newConsumerCount === 1) {
-            // Consumers leaving
+            // Consumers leaving - immediately disconnect them
             this.hideConsumer(1);
             this.hideConsumer(2);
+            // Immediately reassign their partitions to prevent messages going to gone consumers
+            this.partitionAssignments = [0, 0, 0]; // All to C0
+            this.updateConsumerLines();
+            this.updateConsumerPartitionBadges();
         } else if (newConsumerCount === 2) {
-            // Consumer 1 joins
-            this.showConsumer(1);
-            this.hideConsumer(2);
+            if (isJoin) {
+                // Consumer 1 joins
+                this.showConsumer(1);
+            } else {
+                // Consumer 2 leaves
+                this.hideConsumer(2);
+                // Immediately reassign partition 2
+                this.partitionAssignments = [0, 0, 1]; // P0,P1→C0, P2→C1
+                this.updateConsumerLines();
+                this.updateConsumerPartitionBadges();
+            }
         } else if (newConsumerCount === 3) {
             // Consumer 2 joins
             this.showConsumer(1);
@@ -434,7 +448,7 @@ export class Lesson6_Rebalancing extends Scene {
         this.activeConsumerCount = newConsumerCount;
         this.updateRebalanceStatus();
 
-        // Small pause to show the consumer has joined
+        // Small pause to show the consumer has joined/left
         await new Promise(resolve => setTimeout(resolve, 300));
 
         // Step 2: Rebalancing begins (group coordinator detects change)
@@ -444,7 +458,7 @@ export class Lesson6_Rebalancing extends Scene {
         // Step 3: Pause for rebalancing (partitions being reassigned)
         await new Promise(resolve => setTimeout(resolve, this.REBALANCE_REAL_DURATION * 1000));
 
-        // Step 4: Update partition assignments
+        // Step 4: Finalize partition assignments (for joins, assign partitions now)
         if (newConsumerCount === 1) {
             this.partitionAssignments = [0, 0, 0]; // All to C0
         } else if (newConsumerCount === 2) {
