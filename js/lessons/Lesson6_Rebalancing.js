@@ -735,21 +735,22 @@ export class Lesson6_Rebalancing extends Scene {
         const brokerCenter = broker.getPartitionCenter();
         const consumerPoint = consumer.getReceivePoint();
 
-        const tl = gsap.timeline({
-            onComplete: () => {
-                this.removeElement(messageId);
-                const index = this.messages.indexOf(message);
-                if (index > -1) this.messages.splice(index, 1);
-                this.consumerLoad[consumerIndex] = Math.max(0, this.consumerLoad[consumerIndex] - 1);
-            }
-        });
+        // Cleanup helper
+        const cleanupMessage = () => {
+            this.removeElement(messageId);
+            const index = this.messages.indexOf(message);
+            if (index > -1) this.messages.splice(index, 1);
+            this.consumerLoad[consumerIndex] = Math.max(0, this.consumerLoad[consumerIndex] - 1);
+        };
+
+        const tl = gsap.timeline();
 
         // Increment load when message is created
         this.consumerLoad[consumerIndex] += 1;
 
         // Producer → Broker/Partition
         tl.to(messageEl, {
-            duration: 0.7,
+            duration: this.ANIM_TRAVEL_DURATION,
             x: brokerCenter.x,
             y: brokerCenter.y,
             ease: 'power1.inOut'
@@ -757,64 +758,66 @@ export class Lesson6_Rebalancing extends Scene {
 
         // Pause at partition
         tl.to(messageEl, {
-            duration: 0.2,
+            duration: this.ANIM_PAUSE_DURATION,
             scale: 0.9,
             opacity: 0.8
         });
 
         tl.to(messageEl, {
-            duration: 0.2,
+            duration: this.ANIM_PAUSE_DURATION,
             scale: 1,
             opacity: 1
         });
 
-        // Partition → Consumer (only if not rebalancing)
-        tl.add(() => {
+        // Check if rebalancing at partition
+        tl.call(() => {
             if (this.isRebalancing) {
-                // During rebalancing, messages stay at partition
                 // Wait for rebalancing to complete
-                const checkRebalancing = setInterval(() => {
+                const waitForRebalance = () => {
                     if (!this.isRebalancing) {
-                        clearInterval(checkRebalancing);
-                        // Get updated consumer assignment after rebalancing
+                        // Rebalancing complete, send to newly assigned consumer
                         const newConsumerIndex = this.partitionAssignments[partitionIndex];
                         const newConsumer = this.consumers[newConsumerIndex];
                         const newConsumerPoint = newConsumer.getReceivePoint();
 
-                        // Now send to the correct consumer
                         gsap.to(messageEl, {
                             duration: this.ANIM_TRAVEL_DURATION,
                             x: newConsumerPoint.x,
                             y: newConsumerPoint.y,
-                            ease: 'power1.inOut',
-                            onComplete: () => {
-                                // Consume
-                                gsap.to(messageEl, {
-                                    duration: this.ANIM_CONSUME_DURATION,
-                                    scale: 0,
-                                    opacity: 0,
-                                    ease: 'power2.in'
-                                });
-                            }
+                            ease: 'power1.inOut'
+                        }).then(() => {
+                            // Consume
+                            return gsap.to(messageEl, {
+                                duration: this.ANIM_CONSUME_DURATION,
+                                scale: 0,
+                                opacity: 0,
+                                ease: 'power2.in'
+                            });
+                        }).then(() => {
+                            cleanupMessage();
                         });
+                    } else {
+                        // Still rebalancing, check again
+                        setTimeout(waitForRebalance, 100);
                     }
-                }, 100);
+                };
+                waitForRebalance();
             } else {
-                // Not rebalancing, send directly to consumer
-                gsap.to(messageEl, {
+                // No rebalancing, continue to consumer in timeline
+                tl.to(messageEl, {
                     duration: this.ANIM_TRAVEL_DURATION,
                     x: consumerPoint.x,
                     y: consumerPoint.y,
-                    ease: 'power1.inOut',
-                    onComplete: () => {
-                        // Consume
-                        gsap.to(messageEl, {
-                            duration: this.ANIM_CONSUME_DURATION,
-                            scale: 0,
-                            opacity: 0,
-                            ease: 'power2.in'
-                        });
-                    }
+                    ease: 'power1.inOut'
+                });
+
+                // Consume
+                tl.to(messageEl, {
+                    duration: this.ANIM_CONSUME_DURATION,
+                    scale: 0,
+                    opacity: 0,
+                    ease: 'power2.in',
+                    onComplete: cleanupMessage
                 });
             }
         });
