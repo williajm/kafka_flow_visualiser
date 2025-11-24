@@ -530,11 +530,21 @@ export class Lesson6_Rebalancing extends Scene {
         }
 
         // Add consumer 2 (rebalance to 2 consumers)
-        // Use longer timeline duration so rebalancing completes even at max speed
         timeline.add(() => {
             this.rebalance(2);
         }, time);
-        time += this.REBALANCE_TIMELINE_DURATION;
+
+        // Continue scheduling messages during rebalancing - they'll be skipped while isRebalancing=true
+        // This ensures messages resume immediately when rebalancing completes
+        const rebalanceMessages = Math.ceil(this.REBALANCE_TIMELINE_DURATION / this.MESSAGE_SEND_DELAY);
+        for (let i = 0; i < rebalanceMessages; i++) {
+            time += this.MESSAGE_SEND_DELAY;
+            timeline.add(() => {
+                if (!this.isRebalancing) {
+                    this.createAndAnimateMessage();
+                }
+            }, time);
+        }
 
         // Phase 2: 2 consumers (messages 7-13)
         for (let i = 0; i < 7; i++) {
@@ -550,7 +560,16 @@ export class Lesson6_Rebalancing extends Scene {
         timeline.add(() => {
             this.rebalance(3);
         }, time);
-        time += this.REBALANCE_TIMELINE_DURATION;
+
+        // Continue scheduling messages during rebalancing
+        for (let i = 0; i < rebalanceMessages; i++) {
+            time += this.MESSAGE_SEND_DELAY;
+            timeline.add(() => {
+                if (!this.isRebalancing) {
+                    this.createAndAnimateMessage();
+                }
+            }, time);
+        }
 
         // Phase 3: 3 consumers (messages 14-20)
         for (let i = 0; i < 7; i++) {
@@ -566,7 +585,16 @@ export class Lesson6_Rebalancing extends Scene {
         timeline.add(() => {
             this.rebalance(1);
         }, time);
-        time += this.REBALANCE_TIMELINE_DURATION;
+
+        // Continue scheduling messages during rebalancing
+        for (let i = 0; i < rebalanceMessages; i++) {
+            time += this.MESSAGE_SEND_DELAY;
+            timeline.add(() => {
+                if (!this.isRebalancing) {
+                    this.createAndAnimateMessage();
+                }
+            }, time);
+        }
 
         return timeline;
     }
