@@ -1,11 +1,10 @@
 /**
- * Lesson 2: Partitions (Comprehensive)
+ * Lesson 4: Consumer Groups
  * Demonstrates:
- * - Partitions distributed across brokers
- * - Ordering within partitions (sequence numbers)
- * - No ordering across partitions
- * - Key-based routing (hash) vs round-robin
- * - Parallel consumption
+ * - Multiple consumers in the same consumer group
+ * - Partition assignment to consumers (each partition → one consumer)
+ * - Parallel consumption across multiple consumers
+ * - Load balancing across consumers
  */
 
 import { Scene } from '../core/Scene.js';
@@ -15,11 +14,11 @@ import { Consumer } from '../kafka/Consumer.js';
 import { Message } from '../kafka/Message.js';
 import { eventBus } from '../core/EventBus.js';
 
-export class Lesson2_Partitions extends Scene {
+export class Lesson4_ConsumerGroups extends Scene {
     constructor(canvas) {
         super(canvas, {
-            title: 'Kafka Partitions Explained',
-            description: 'Partitions divide topics across brokers for scalability. Messages distribute round-robin across partitions for even load distribution. Each partition maintains order, and a single consumer can read from all partitions.'
+            title: 'Kafka Consumer Groups',
+            description: 'Consumer groups enable parallel processing. Each partition is assigned to exactly one consumer in a group, allowing multiple consumers to process messages simultaneously.'
         });
 
         this.producer = null;
@@ -28,21 +27,22 @@ export class Lesson2_Partitions extends Scene {
         this.messages = [];
         this.messageCount = 0;
         this.partitionCount = 3;
-        this.partitionAssignments = [0, 0, 0]; // All partitions → single consumer
-        this.consumerCount = 1;
+        // Partition assignments: P0→C0, P1→C1, P2→C2 (one partition per consumer)
+        this.partitionAssignments = [0, 1, 2];
+        this.consumerCount = 3;
 
         // Track sequence numbers per partition
         this.partitionSequence = [0, 0, 0];
 
-        // Track GLOBAL message order (to show cross-partition ordering doesn't matter)
+        // Track GLOBAL message order
         this.globalMessageCount = 0;
 
         // Track message history per consumer (for display)
         this.consumerHistory = Array.from({ length: this.consumerCount }, () => []);
         this.maxHistorySize = 3;
 
-        // Track in-flight load per broker for a visual load indicator
-        this.brokerLoad = Array(this.partitionCount).fill(0);
+        // Track in-flight load per consumer
+        this.consumerLoad = Array(this.consumerCount).fill(0);
 
         // Round-robin distribution
         this.roundRobinIndex = 0;
@@ -55,12 +55,12 @@ export class Lesson2_Partitions extends Scene {
      * Setup the scene
      */
     async setup() {
-        // Producer on the left (aligned with partition 1 for a straight line)
-        this.producer = new Producer('producer-1', 80, 240);
+        // Producer on the left
+        this.producer = new Producer('producer-1', 80, 230);
 
-        // Three brokers in the middle (vertically stacked to show distribution)
+        // Three brokers in the middle (vertically stacked)
         const brokerX = 380;
-        const brokerStartY = 120;
+        const brokerStartY = 150;
         const brokerSpacing = 110;
 
         for (let i = 0; i < this.partitionCount; i++) {
@@ -68,11 +68,11 @@ export class Lesson2_Partitions extends Scene {
             this.brokers.push(broker);
         }
 
-        // Consumers on the right
+        // Three consumers on the right (perfectly aligned with brokers for horizontal lines)
         const consumerX = 900;
-        // Align consumer with partition 1 for a straight line
-        const consumerStartY = 240;
-        const consumerSpacing = 160;
+        // Offset consumers slightly so partition→consumer lines stay horizontal (1:1 mapping)
+        const consumerStartY = 160;
+        const consumerSpacing = 110;  // Same spacing as brokers
 
         for (let i = 0; i < this.consumerCount; i++) {
             const consumer = new Consumer(`consumer-${i}`, consumerX, consumerStartY + (i * consumerSpacing), 'consumer-group-1');
@@ -99,6 +99,7 @@ export class Lesson2_Partitions extends Scene {
         this.addConsumerPartitionBadges();
         this.addConsumerHistoryDisplays();
         this.addLoadIndicator();
+        this.addConsumerGroupLabel();
         this.setupClickHandlers();
 
         // Create animation timeline
@@ -129,7 +130,7 @@ export class Lesson2_Partitions extends Scene {
             this.addElement(`line-producer-broker-${i}`, line);
         });
 
-        // Brokers → Consumers (supports one consumer handling multiple partitions)
+        // Brokers → Consumers (1-to-1 mapping)
         this.brokers.forEach((broker, i) => {
             const brokerPoint = broker.getEmitPoint();
             const consumerIndex = this.partitionAssignments[i];
@@ -140,13 +141,13 @@ export class Lesson2_Partitions extends Scene {
                 consumerPoint.x,
                 consumerPoint.y,
                 {
-                    stroke: '#2D3561',
-                    'stroke-width': 1,
-                    'stroke-dasharray': '3,3',
-                    opacity: 0.4
+                    stroke: '#34D399',
+                    'stroke-width': 2,
+                    'stroke-dasharray': '5,5',
+                    opacity: 0.6
                 }
             );
-            this.addElement(`line-broker-consumer-${i}-to-${consumerIndex}`, line);
+            this.addElement(`line-broker-consumer-${i}`, line);
         });
     }
 
@@ -156,7 +157,7 @@ export class Lesson2_Partitions extends Scene {
     addLabels() {
         // Title
         const title = this.createText(
-            'Distributed Partitions Across Brokers',
+            'Consumer Group: Parallel Processing',
             600,
             50,
             {
@@ -170,10 +171,40 @@ export class Lesson2_Partitions extends Scene {
     }
 
     /**
+     * Add consumer group label
+     */
+    addConsumerGroupLabel() {
+        const x = 900;
+        const y = 110;
+
+        const groupBox = this.createRect(x, y, 180, 30, {
+            fill: '#141B3D',
+            stroke: '#34D399',
+            'stroke-width': 1.5,
+            rx: 8,
+            opacity: 0.8
+        });
+        this.addElement('consumer-group-box', groupBox);
+
+        const groupLabel = this.createText(
+            'Consumer Group: consumer-group-1',
+            x + 90,
+            y + 19,
+            {
+                'font-size': '10',
+                'font-weight': '600',
+                'fill': '#34D399',
+                'text-anchor': 'middle'
+            }
+        );
+        this.addElement('consumer-group-label', groupLabel);
+    }
+
+    /**
      * Add a topic frame around partitions
      */
     addTopicContainer() {
-        const frame = this.createRect(330, 90, 360, 380, {
+        const frame = this.createRect(330, 120, 360, 380, {
             fill: '#0B122C',
             stroke: '#2D3561',
             'stroke-width': 2,
@@ -184,9 +215,9 @@ export class Lesson2_Partitions extends Scene {
         this.addElement('topic-frame', frame);
 
         const label = this.createText(
-            'Topic: user-events (3 partitions)',
+            'Topic: events (3 partitions)',
             510,
-            110,
+            140,
             {
                 'font-size': '12',
                 'font-weight': '700',
@@ -198,7 +229,6 @@ export class Lesson2_Partitions extends Scene {
         this.addElement('topic-label', label);
     }
 
-
     /**
      * Add consumer history displays
      */
@@ -208,7 +238,7 @@ export class Lesson2_Partitions extends Scene {
             const historyY = consumer.y - 10;
 
             // History box background
-            const historyBox = this.createRect(historyX, historyY, 150, 90, {
+            const historyBox = this.createRect(historyX, historyY, 120, 90, {
                 fill: '#141B3D',
                 stroke: '#2D3561',
                 'stroke-width': 1,
@@ -219,8 +249,8 @@ export class Lesson2_Partitions extends Scene {
 
             // Title
             const title = this.createText(
-                'Consumed (partition order):',
-                historyX + 75,
+                'Consumed:',
+                historyX + 60,
                 historyY + 15,
                 {
                     'font-size': '9',
@@ -236,7 +266,7 @@ export class Lesson2_Partitions extends Scene {
 
                 const msgText = this.createText(
                     '—',
-                    historyX + 75,
+                    historyX + 60,
                     msgY,
                     {
                         'font-size': '10',
@@ -251,12 +281,12 @@ export class Lesson2_Partitions extends Scene {
     }
 
     /**
-     * Add load indicator showing broker load distribution (in-flight messages per broker/partition)
+     * Add load indicator showing consumer load distribution
      */
     addLoadIndicator() {
-        const x = 720;
-        const y = 500;
-        const width = 380;
+        const x = 80;
+        const y = 380;
+        const width = 220;
         const height = 110;
 
         const box = this.createRect(x, y, width, height, {
@@ -269,7 +299,7 @@ export class Lesson2_Partitions extends Scene {
         this.addElement('load-box', box);
 
         const title = this.createText(
-            'Broker Load Distribution (in-flight per partition)',
+            'Consumer Load (in-flight)',
             x + width / 2,
             y + 18,
             {
@@ -281,16 +311,16 @@ export class Lesson2_Partitions extends Scene {
         );
         this.addElement('load-title', title);
 
-        this.brokers.forEach((_, i) => {
+        this.consumers.forEach((_, i) => {
             const rowY = y + 34 + (i * 22);
             const label = this.createText(
-                `P${i}`,
+                `C${i}`,
                 x + 12,
                 rowY + 8,
                 {
                     'font-size': '10',
                     'font-weight': '700',
-                    'fill': '#60A5FA',
+                    'fill': '#34D399',
                     'text-anchor': 'start'
                 }
             );
@@ -314,11 +344,11 @@ export class Lesson2_Partitions extends Scene {
         });
 
         const note = this.createText(
-            'Partitions distribute load across brokers. Key-based routing may cause uneven distribution.',
+            'Each consumer processes one partition in parallel.',
             x + width / 2,
             y + height - 10,
             {
-                'font-size': '9',
+                'font-size': '8',
                 'fill': '#94A3B8',
                 'text-anchor': 'middle'
             }
@@ -347,17 +377,12 @@ export class Lesson2_Partitions extends Scene {
         }
 
         // Update display
-        const historyX = this.consumers[consumerIndex].x + this.consumers[consumerIndex].width + 35;
-        const historyY = this.consumers[consumerIndex].y - 10;
-
         for (let j = 0; j < this.maxHistorySize; j++) {
             const msgElement = this.getElement(`consumer-${consumerIndex}-history-msg-${j}`);
             if (msgElement) {
                 if (j < history.length) {
                     const msg = history[j];
-                    // Show: "P0:A #1 (3)" - partition, partition order + global order
-                    const keyLabel = msg.key.includes('-') ? msg.key.split('-')[1] : msg.key;
-                    msgElement.textContent = `P${msg.partitionIndex}:${keyLabel} #${msg.seqNum} (${msg.globalNum})`;
+                    msgElement.textContent = `P${msg.partitionIndex} #${msg.seqNum}`;
                     msgElement.setAttribute('fill', msg.color);
                     msgElement.setAttribute('opacity', '1');
                 } else {
@@ -377,7 +402,7 @@ export class Lesson2_Partitions extends Scene {
         if (producerEl) {
             producerEl.addEventListener('click', () => {
                 const info = this.producer.getInfo();
-                info.description += ` Messages distribute round-robin across all partitions for even load distribution.`;
+                info.description += ` Messages distribute round-robin across all partitions.`;
                 eventBus.emit('entity:click', info);
             });
         }
@@ -386,26 +411,28 @@ export class Lesson2_Partitions extends Scene {
             const brokerEl = this.getElement(`broker-${i}`);
             if (brokerEl) {
                 brokerEl.addEventListener('click', () => {
-                    eventBus.emit('entity:click', broker.getInfo());
+                    const info = broker.getInfo();
+                    const consumerIndex = this.partitionAssignments[i];
+                    info.description += ` This partition is assigned to Consumer ${consumerIndex} in the consumer group.`;
+                    eventBus.emit('entity:click', info);
                 });
             }
         });
 
         this.consumers.forEach((consumer, i) => {
-                const consumerEl = this.getElement(`consumer-${i}`);
-                if (consumerEl) {
-                    consumerEl.addEventListener('click', () => {
-                        const info = consumer.getInfo();
-                        const partitions = this.getPartitionsForConsumer(i);
-                        info.description = partitions.length > 1
-                            ? `Consumer ${i} is assigned multiple partitions (${partitions.map(p => `P${p}`).join(', ')}) to show a single process handling more than one partition.`
-                            : `Consumer ${i} reads only from Partition ${partitions[0]}.`;
-                        info.details['Assigned Partition(s)'] = partitions.map(p => `P${p}`).join(', ');
-                        eventBus.emit('entity:click', info);
-                    });
-                }
-            });
-        }
+            const consumerEl = this.getElement(`consumer-${i}`);
+            if (consumerEl) {
+                consumerEl.addEventListener('click', () => {
+                    const info = consumer.getInfo();
+                    const partitions = this.getPartitionsForConsumer(i);
+                    info.description = `Consumer ${i} is assigned Partition ${partitions[0]} exclusively. Other consumers in the group handle the other partitions.`;
+                    info.details['Assigned Partition(s)'] = partitions.map(p => `P${p}`).join(', ');
+                    info.details['Consumer Group'] = 'consumer-group-1';
+                    eventBus.emit('entity:click', info);
+                });
+            }
+        });
+    }
 
     /**
      * Create animation timeline
@@ -435,37 +462,33 @@ export class Lesson2_Partitions extends Scene {
         this.consumers.forEach((consumer, i) => {
             const partitions = this.getPartitionsForConsumer(i);
             const badgeHeight = 18;
-            const totalWidth = partitions.length * 30 + (partitions.length - 1) * 4;
-            const badgeX = consumer.x + consumer.width - totalWidth - 12;
+            const badgeWidth = 30;
+            const badgeX = consumer.x + consumer.width - badgeWidth - 12;
             const badgeY = consumer.y + 8;
 
-            partitions.forEach((p, idx) => {
-                const badgeWidth = 30;
-                const xOffset = badgeX + idx * (badgeWidth + 4);
-                const badge = this.createRect(xOffset, badgeY, badgeWidth, badgeHeight, {
-                    fill: '#0B122C',
-                    stroke: '#34D399',
-                    'stroke-width': 1.5,
-                    rx: 6,
-                    opacity: 0.9
-                });
-                badge.setAttribute('pointer-events', 'none');
-                this.addElement(`consumer-badge-${i}-${p}`, badge);
-
-                const label = this.createText(
-                    `P${p}`,
-                    xOffset + badgeWidth / 2,
-                    badgeY + 12,
-                    {
-                        'font-size': '10',
-                        'font-weight': '700',
-                        'fill': '#D1FAE5',
-                        'text-anchor': 'middle'
-                    }
-                );
-                label.setAttribute('pointer-events', 'none');
-                this.addElement(`consumer-badge-label-${i}-${p}`, label);
+            const badge = this.createRect(badgeX, badgeY, badgeWidth, badgeHeight, {
+                fill: '#0B122C',
+                stroke: '#34D399',
+                'stroke-width': 1.5,
+                rx: 6,
+                opacity: 0.9
             });
+            badge.setAttribute('pointer-events', 'none');
+            this.addElement(`consumer-badge-${i}`, badge);
+
+            const label = this.createText(
+                `P${partitions[0]}`,
+                badgeX + badgeWidth / 2,
+                badgeY + 12,
+                {
+                    'font-size': '10',
+                    'font-weight': '700',
+                    'fill': '#D1FAE5',
+                    'text-anchor': 'middle'
+                }
+            );
+            label.setAttribute('pointer-events', 'none');
+            this.addElement(`consumer-badge-label-${i}`, label);
         });
     }
 
@@ -541,14 +564,14 @@ export class Lesson2_Partitions extends Scene {
                 this.removeElement(messageId);
                 const index = this.messages.indexOf(message);
                 if (index > -1) this.messages.splice(index, 1);
-                this.brokerLoad[partitionIndex] = Math.max(0, this.brokerLoad[partitionIndex] - 1);
-                this.updateLoadIndicator(partitionIndex);
+                this.consumerLoad[consumerIndex] = Math.max(0, this.consumerLoad[consumerIndex] - 1);
+                this.updateLoadIndicator(consumerIndex);
             }
         });
 
         // Increment load when message is created
-        this.brokerLoad[partitionIndex] += 1;
-        this.updateLoadIndicator(partitionIndex);
+        this.consumerLoad[consumerIndex] += 1;
+        this.updateLoadIndicator(consumerIndex);
 
         // Producer → Broker/Partition
         tl.to(messageEl, {
@@ -601,7 +624,7 @@ export class Lesson2_Partitions extends Scene {
         this.partitionSequence = [0, 0, 0];
         this.globalMessageCount = 0;
         this.consumerHistory = Array.from({ length: this.consumerCount }, () => []);
-        this.brokerLoad = Array(this.partitionCount).fill(0);
+        this.consumerLoad = Array(this.consumerCount).fill(0);
         super.destroy();
     }
 
@@ -617,16 +640,16 @@ export class Lesson2_Partitions extends Scene {
     }
 
     /**
-     * Update visual load bars for a broker/partition (in-flight messages)
-     * @param {number} partitionIndex
+     * Update visual load bars for a consumer (in-flight messages)
+     * @param {number} consumerIndex
      */
-    updateLoadIndicator(partitionIndex) {
-        const load = this.brokerLoad[partitionIndex];
+    updateLoadIndicator(consumerIndex) {
+        const load = this.consumerLoad[consumerIndex];
         const maxVisual = 6; // clamp for visuals
         const normalized = Math.min(load, maxVisual);
         const baseWidth = 10;
         const barWidth = baseWidth + normalized * 22;
-        const barFill = this.getElement(`load-bar-fill-${partitionIndex}`);
+        const barFill = this.getElement(`load-bar-fill-${consumerIndex}`);
         if (barFill) {
             barFill.setAttribute('width', barWidth);
             barFill.setAttribute('fill', load > 3 ? '#F59E0B' : '#22D3EE');

@@ -9,6 +9,10 @@ import { InfoPanel } from './ui/InfoPanel.js';
 import { Navigation } from './ui/Navigation.js';
 import { Lesson1_Basics } from './lessons/Lesson1_Basics.js';
 import { Lesson2_Partitions } from './lessons/Lesson2_Partitions.js';
+import { Lesson3_PartitionsWithKeys } from './lessons/Lesson3_PartitionsWithKeys.js';
+import { Lesson4_ConsumerGroups } from './lessons/Lesson4_ConsumerGroups.js';
+import { Lesson5_Offsets } from './lessons/Lesson5_Offsets.js';
+import { Lesson6_Rebalancing } from './lessons/Lesson6_Rebalancing.js';
 import { Broker } from './kafka/Broker.js';
 
 class KafkaFlowVisualizer {
@@ -47,9 +51,10 @@ class KafkaFlowVisualizer {
     registerLessons() {
         this.lessons.set('basics', Lesson1_Basics);
         this.lessons.set('partitions', Lesson2_Partitions);
-        // More lessons will be added here:
-        // this.lessons.set('consumer-groups', Lesson3_ConsumerGroups);
-        // etc.
+        this.lessons.set('partitions-keys', Lesson3_PartitionsWithKeys);
+        this.lessons.set('consumer-groups', Lesson4_ConsumerGroups);
+        this.lessons.set('offsets', Lesson5_Offsets);
+        this.lessons.set('rebalancing', Lesson6_Rebalancing);
     }
 
     /**

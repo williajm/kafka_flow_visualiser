@@ -49,6 +49,12 @@ export class Controls {
         eventBus.on('scene:reset', () => {
             this.updatePlayState(false);
         });
+
+        eventBus.on('scene:ready', () => {
+            // When a new scene is loaded, reset to paused state
+            this.isPlaying = false;
+            this.updatePlayState(false);
+        });
     }
 
     /**

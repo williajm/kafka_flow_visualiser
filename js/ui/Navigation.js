@@ -11,7 +11,7 @@ export class Navigation {
         this.lessonList = document.getElementById('lessonList');
         this.toggleBtn = document.getElementById('sidebarToggle');
         this.currentLesson = 'basics';
-        this.unlockedLessons = new Set(['basics', 'partitions']); // Unlock first two lessons
+        this.unlockedLessons = new Set(['basics', 'partitions', 'partitions-keys', 'consumer-groups', 'offsets', 'rebalancing']); // Unlock all lessons
 
         this.init();
     }
@@ -27,6 +27,16 @@ export class Navigation {
                 lessonItem.classList.remove('locked');
             }
         });
+
+        // Set initial active lesson indicator
+        const activeItem = this.lessonList.querySelector(`[data-lesson="${this.currentLesson}"]`);
+        if (activeItem) {
+            const status = activeItem.querySelector('.lesson-status');
+            if (status) {
+                status.textContent = '●';
+                status.style.color = 'var(--color-success)';
+            }
+        }
 
         // Toggle sidebar
         this.toggleBtn.addEventListener('click', () => {
@@ -72,10 +82,20 @@ export class Navigation {
         // Update UI
         const items = this.lessonList.querySelectorAll('.lesson-item');
         items.forEach(item => {
+            const status = item.querySelector('.lesson-status');
             if (item.dataset.lesson === lessonId) {
                 item.classList.add('active');
+                // Add green dot for active lesson
+                if (status) {
+                    status.textContent = '●';
+                    status.style.color = 'var(--color-success)';
+                }
             } else {
                 item.classList.remove('active');
+                // Remove dot from inactive lessons
+                if (status && !status.textContent.includes('✓')) {
+                    status.textContent = '';
+                }
             }
         });
 
@@ -90,7 +110,7 @@ export class Navigation {
      * @param {string} completedLessonId
      */
     unlockNextLesson(completedLessonId) {
-        const lessons = ['basics', 'partitions', 'consumer-groups', 'offsets', 'rebalancing'];
+        const lessons = ['basics', 'partitions', 'partitions-keys', 'consumer-groups', 'offsets', 'rebalancing'];
         const currentIndex = lessons.indexOf(completedLessonId);
 
         if (currentIndex >= 0 && currentIndex < lessons.length - 1) {
