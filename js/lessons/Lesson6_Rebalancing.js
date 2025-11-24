@@ -158,6 +158,13 @@ export class Lesson6_Rebalancing extends Scene {
             const brokerPoint = broker.getEmitPoint();
             const consumerIndex = this.partitionAssignments[i];
             const consumerPoint = this.consumers[consumerIndex].getReceivePoint();
+            const consumerEl = this.getElement(`consumer-${consumerIndex}`);
+
+            // Skip drawing lines to consumers that are currently hidden/removed
+            if (!consumerEl || consumerEl.style.display === 'none') {
+                return;
+            }
+
             const line = this.createLine(
                 brokerPoint.x,
                 brokerPoint.y,
@@ -401,6 +408,20 @@ export class Lesson6_Rebalancing extends Scene {
             consumerEl.style.opacity = '0';
             consumerEl.style.display = 'none';
         }
+
+        // Remove any connection lines pointing to this consumer
+        this.partitionAssignments.forEach((assigned, partition) => {
+            if (assigned === index) {
+                this.removeElement(`line-broker-consumer-${partition}`);
+            }
+        });
+
+        // Remove in-flight messages heading to this consumer
+        this.messages.slice().forEach(message => {
+            if (message.currentConsumerIndex === index) {
+                this.removeMessageNow(message);
+            }
+        });
 
         // Hide partition badges for this consumer
         for (let p = 0; p < this.partitionCount; p++) {
@@ -667,6 +688,32 @@ export class Lesson6_Rebalancing extends Scene {
     }
 
     /**
+     * Immediately cancel and remove a message (used when consumers are hidden)
+     * @param {Message} message
+     */
+    removeMessageNow(message) {
+        const el = this.getElement(message.id);
+
+        // Stop any active tweens for this message
+        if (el) {
+            gsap.killTweensOf(el);
+        }
+        if (message.timeline) {
+            message.timeline.eventCallback('onComplete', null);
+            message.timeline.kill();
+        }
+
+        this.removeElement(message.id);
+        const index = this.messages.indexOf(message);
+        if (index > -1) this.messages.splice(index, 1);
+
+        const consumerIndex = message.currentConsumerIndex;
+        if (typeof consumerIndex === 'number') {
+            this.consumerLoad[consumerIndex] = Math.max(0, this.consumerLoad[consumerIndex] - 1);
+        }
+    }
+
+    /**
      * Create and animate message in round-robin fashion
      */
     createAndAnimateMessage() {
@@ -688,6 +735,8 @@ export class Lesson6_Rebalancing extends Scene {
         // Create message
         const message = new Message(messageId, producerPoint.x, producerPoint.y);
         const messageEl = message.render();
+        message.currentConsumerIndex = consumerIndex;
+        message.partitionIndex = partitionIndex;
 
         // Color the message
         const circles = messageEl.querySelectorAll('circle');
@@ -737,16 +786,14 @@ export class Lesson6_Rebalancing extends Scene {
 
         // Cleanup helper
         const cleanupMessage = () => {
-            this.removeElement(messageId);
-            const index = this.messages.indexOf(message);
-            if (index > -1) this.messages.splice(index, 1);
-            this.consumerLoad[consumerIndex] = Math.max(0, this.consumerLoad[consumerIndex] - 1);
+            this.removeMessageNow(message);
         };
 
         const tl = gsap.timeline();
+        message.timeline = tl;
 
         // Increment load when message is created
-        this.consumerLoad[consumerIndex] += 1;
+        this.consumerLoad[message.currentConsumerIndex] += 1;
 
         // Producer → Broker/Partition
         tl.to(messageEl, {
@@ -774,11 +821,21 @@ export class Lesson6_Rebalancing extends Scene {
             if (this.isRebalancing) {
                 // Wait for rebalancing to complete
                 const waitForRebalance = () => {
+                    // Message might have been removed while waiting
+                    if (!this.messages.includes(message)) {
+                        return;
+                    }
+
                     if (!this.isRebalancing) {
                         // Rebalancing complete, send to newly assigned consumer
                         const newConsumerIndex = this.partitionAssignments[partitionIndex];
                         const newConsumer = this.consumers[newConsumerIndex];
                         const newConsumerPoint = newConsumer.getReceivePoint();
+                        if (newConsumerIndex !== message.currentConsumerIndex) {
+                            this.consumerLoad[message.currentConsumerIndex] = Math.max(0, this.consumerLoad[message.currentConsumerIndex] - 1);
+                            this.consumerLoad[newConsumerIndex] += 1;
+                            message.currentConsumerIndex = newConsumerIndex;
+                        }
 
                         gsap.to(messageEl, {
                             duration: this.ANIM_TRAVEL_DURATION,
