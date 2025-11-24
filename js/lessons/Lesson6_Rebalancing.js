@@ -413,20 +413,19 @@ export class Lesson6_Rebalancing extends Scene {
 
     /**
      * Perform rebalancing
-     * In real Kafka: consumer joins/leaves first, THEN rebalancing happens
+     * In real Kafka: consumer joins/leaves, consumption stops, rebalancing happens, consumption resumes
      */
     async rebalance(newConsumerCount) {
         const isJoin = newConsumerCount > this.activeConsumerCount;
 
-        // Step 1: Consumer joins/leaves the group (membership change)
+        // Step 1: Stop consumption immediately when membership changes
+        this.isRebalancing = true;
+
+        // Step 2: Consumer joins/leaves the group (membership change)
         if (newConsumerCount === 1) {
-            // Consumers leaving - immediately disconnect them
+            // Consumers leaving
             this.hideConsumer(1);
             this.hideConsumer(2);
-            // Immediately reassign their partitions to prevent messages going to gone consumers
-            this.partitionAssignments = [0, 0, 0]; // All to C0
-            this.updateConsumerLines();
-            this.updateConsumerPartitionBadges();
         } else if (newConsumerCount === 2) {
             if (isJoin) {
                 // Consumer 1 joins
@@ -434,10 +433,6 @@ export class Lesson6_Rebalancing extends Scene {
             } else {
                 // Consumer 2 leaves
                 this.hideConsumer(2);
-                // Immediately reassign partition 2
-                this.partitionAssignments = [0, 0, 1]; // P0,P1→C0, P2→C1
-                this.updateConsumerLines();
-                this.updateConsumerPartitionBadges();
             }
         } else if (newConsumerCount === 3) {
             // Consumer 2 joins
@@ -451,14 +446,10 @@ export class Lesson6_Rebalancing extends Scene {
         // Small pause to show the consumer has joined/left
         await new Promise(resolve => setTimeout(resolve, 300));
 
-        // Step 2: Rebalancing begins (group coordinator detects change)
-        this.isRebalancing = true;
-        this.updateRebalanceStatus();
-
         // Step 3: Pause for rebalancing (partitions being reassigned)
         await new Promise(resolve => setTimeout(resolve, this.REBALANCE_REAL_DURATION * 1000));
 
-        // Step 4: Finalize partition assignments (for joins, assign partitions now)
+        // Step 4: Assign partitions based on new consumer count
         if (newConsumerCount === 1) {
             this.partitionAssignments = [0, 0, 0]; // All to C0
         } else if (newConsumerCount === 2) {
@@ -473,7 +464,7 @@ export class Lesson6_Rebalancing extends Scene {
         // Update partition badges
         this.updateConsumerPartitionBadges();
 
-        // Step 5: Rebalancing completes
+        // Step 5: Rebalancing completes, consumption resumes
         this.isRebalancing = false;
         this.updateRebalanceStatus();
     }
