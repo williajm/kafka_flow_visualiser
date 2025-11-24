@@ -54,7 +54,7 @@ export class Lesson6_Rebalancing extends Scene {
         this.ANIM_PAUSE_DURATION = 0.2;
         this.ANIM_CONSUME_DURATION = 0.3;
         this.MESSAGE_SEND_DELAY = 0.65;
-        this.REBALANCE_DURATION = 1.5;
+        this.REBALANCE_DURATION = 2.5; // Longer to see the rebalancing state
     }
 
     /**
@@ -494,13 +494,13 @@ export class Lesson6_Rebalancing extends Scene {
     createAnimationTimeline() {
         const timeline = this.animator.createTimeline({
             repeat: -1,
-            repeatDelay: 2
+            repeatDelay: 3
         });
 
         let time = 0;
 
-        // Phase 1: Start with 1 consumer (messages 0-4)
-        for (let i = 0; i < 5; i++) {
+        // Phase 1: Start with 1 consumer (messages 0-6)
+        for (let i = 0; i < 7; i++) {
             timeline.add(() => {
                 if (!this.isRebalancing) {
                     this.createAndAnimateMessage();
@@ -516,8 +516,8 @@ export class Lesson6_Rebalancing extends Scene {
         }, time);
         time += this.REBALANCE_DURATION;
 
-        // Phase 2: 2 consumers (messages 5-9)
-        for (let i = 0; i < 5; i++) {
+        // Phase 2: 2 consumers (messages 7-13)
+        for (let i = 0; i < 7; i++) {
             timeline.add(() => {
                 if (!this.isRebalancing) {
                     this.createAndAnimateMessage();
@@ -532,8 +532,8 @@ export class Lesson6_Rebalancing extends Scene {
         }, time);
         time += this.REBALANCE_DURATION;
 
-        // Phase 3: 3 consumers (messages 10-14)
-        for (let i = 0; i < 5; i++) {
+        // Phase 3: 3 consumers (messages 14-20)
+        for (let i = 0; i < 7; i++) {
             timeline.add(() => {
                 if (!this.isRebalancing) {
                     this.createAndAnimateMessage();
