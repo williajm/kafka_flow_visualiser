@@ -49,6 +49,12 @@ export class Lesson4_ConsumerGroups extends Scene {
 
         // Message color
         this.messageColor = '#94A3B8';  // Gray
+
+        // Animation constants
+        this.ANIM_TRAVEL_DURATION = 0.7;
+        this.ANIM_PAUSE_DURATION = 0.2;
+        this.ANIM_CONSUME_DURATION = 0.3;
+        this.MESSAGE_SEND_DELAY = 0.65;
     }
 
     /**
@@ -619,6 +625,11 @@ export class Lesson4_ConsumerGroups extends Scene {
      * Cleanup
      */
     destroy() {
+        // Kill all GSAP animations for this scene
+        this.messages.forEach(msg => {
+            const el = this.elements.get(`message-${msg.id || this.messages.indexOf(msg)}`);
+            if (el) gsap.killTweensOf(el);
+        });
         this.messages = [];
         this.messageCount = 0;
         this.partitionSequence = [0, 0, 0];

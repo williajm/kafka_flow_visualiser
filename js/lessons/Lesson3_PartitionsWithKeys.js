@@ -55,6 +55,12 @@ export class Lesson3_PartitionsWithKeys extends Scene {
             'user-B': '#FBBF24',  // Yellow
             'user-C': '#F472B6'   // Pink
         };
+
+        // Animation constants
+        this.ANIM_TRAVEL_DURATION = 0.7;
+        this.ANIM_PAUSE_DURATION = 0.2;
+        this.ANIM_CONSUME_DURATION = 0.3;
+        this.MESSAGE_SEND_DELAY = 0.65;
     }
 
     /**
@@ -522,7 +528,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
         ];
 
         keyedSequence.forEach((key, i) => {
-            const delay = i * 0.65;
+            const delay = i * this.MESSAGE_SEND_DELAY;
             timeline.add(() => {
                 this.createAndAnimateMessage(key);
             }, delay);
@@ -657,7 +663,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
 
         // Producer → Broker/Partition
         tl.to(messageEl, {
-            duration: 0.7,
+            duration: this.ANIM_TRAVEL_DURATION,
             x: brokerCenter.x,
             y: brokerCenter.y,
             ease: 'power1.inOut'
@@ -665,20 +671,20 @@ export class Lesson3_PartitionsWithKeys extends Scene {
 
         // Pause at partition
         tl.to(messageEl, {
-            duration: 0.2,
+            duration: this.ANIM_PAUSE_DURATION,
             scale: 0.9,
             opacity: 0.8
         });
 
         tl.to(messageEl, {
-            duration: 0.2,
+            duration: this.ANIM_PAUSE_DURATION,
             scale: 1,
             opacity: 1
         });
 
         // Partition → Consumer
         tl.to(messageEl, {
-            duration: 0.7,
+            duration: this.ANIM_TRAVEL_DURATION,
             x: consumerPoint.x,
             y: consumerPoint.y,
             ease: 'power1.inOut'
@@ -686,7 +692,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
 
         // Consume
         tl.to(messageEl, {
-            duration: 0.3,
+            duration: this.ANIM_CONSUME_DURATION,
             scale: 0,
             opacity: 0,
             ease: 'power2.in',
@@ -701,6 +707,11 @@ export class Lesson3_PartitionsWithKeys extends Scene {
      * Cleanup
      */
     destroy() {
+        // Kill all GSAP animations for this scene
+        this.messages.forEach(msg => {
+            const el = this.elements.get(`message-${msg.id || this.messages.indexOf(msg)}`);
+            if (el) gsap.killTweensOf(el);
+        });
         this.messages = [];
         this.messageCount = 0;
         this.partitionSequence = [0, 0, 0];

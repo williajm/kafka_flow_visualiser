@@ -49,6 +49,12 @@ export class Lesson2_Partitions extends Scene {
 
         // Message color
         this.messageColor = '#94A3B8';  // Gray
+
+        // Animation constants
+        this.ANIM_TRAVEL_DURATION = 0.7;
+        this.ANIM_PAUSE_DURATION = 0.2;
+        this.ANIM_CONSUME_DURATION = 0.3;
+        this.MESSAGE_SEND_DELAY = 0.65;
     }
 
     /**
@@ -355,9 +361,9 @@ export class Lesson2_Partitions extends Scene {
             if (msgElement) {
                 if (j < history.length) {
                     const msg = history[j];
-                    // Show: "P0:A #1 (3)" - partition, partition order + global order
-                    const keyLabel = msg.key.includes('-') ? msg.key.split('-')[1] : msg.key;
-                    msgElement.textContent = `P${msg.partitionIndex}:${keyLabel} #${msg.seqNum} (${msg.globalNum})`;
+                    // Show: "P0 #1" - partition and partition sequence number
+                    // Simpler format for round-robin lesson (no keys)
+                    msgElement.textContent = `P${msg.partitionIndex} #${msg.seqNum}`;
                     msgElement.setAttribute('fill', msg.color);
                     msgElement.setAttribute('opacity', '1');
                 } else {
@@ -419,7 +425,7 @@ export class Lesson2_Partitions extends Scene {
         // Send messages in round-robin fashion
         const messageCount = 15;
         for (let i = 0; i < messageCount; i++) {
-            const delay = i * 0.65;
+            const delay = i * this.MESSAGE_SEND_DELAY;
             timeline.add(() => {
                 this.createAndAnimateMessage();
             }, delay);
@@ -552,7 +558,7 @@ export class Lesson2_Partitions extends Scene {
 
         // Producer → Broker/Partition
         tl.to(messageEl, {
-            duration: 0.7,
+            duration: this.ANIM_TRAVEL_DURATION,
             x: brokerCenter.x,
             y: brokerCenter.y,
             ease: 'power1.inOut'
@@ -560,20 +566,20 @@ export class Lesson2_Partitions extends Scene {
 
         // Pause at partition
         tl.to(messageEl, {
-            duration: 0.2,
+            duration: this.ANIM_PAUSE_DURATION,
             scale: 0.9,
             opacity: 0.8
         });
 
         tl.to(messageEl, {
-            duration: 0.2,
+            duration: this.ANIM_PAUSE_DURATION,
             scale: 1,
             opacity: 1
         });
 
         // Partition → Consumer
         tl.to(messageEl, {
-            duration: 0.7,
+            duration: this.ANIM_TRAVEL_DURATION,
             x: consumerPoint.x,
             y: consumerPoint.y,
             ease: 'power1.inOut'
@@ -581,7 +587,7 @@ export class Lesson2_Partitions extends Scene {
 
         // Consume
         tl.to(messageEl, {
-            duration: 0.3,
+            duration: this.ANIM_CONSUME_DURATION,
             scale: 0,
             opacity: 0,
             ease: 'power2.in',
@@ -596,6 +602,11 @@ export class Lesson2_Partitions extends Scene {
      * Cleanup
      */
     destroy() {
+        // Kill all GSAP animations for this scene
+        this.messages.forEach(msg => {
+            const el = this.elements.get(`message-${msg.id || this.messages.indexOf(msg)}`);
+            if (el) gsap.killTweensOf(el);
+        });
         this.messages = [];
         this.messageCount = 0;
         this.partitionSequence = [0, 0, 0];

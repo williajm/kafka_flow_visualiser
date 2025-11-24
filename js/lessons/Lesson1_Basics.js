@@ -264,6 +264,11 @@ export class Lesson1_Basics extends Scene {
      * Cleanup
      */
     destroy() {
+        // Kill all GSAP animations for this scene
+        this.messages.forEach(msg => {
+            const el = this.elements.get(`message-${msg.id || this.messages.indexOf(msg)}`);
+            if (el) gsap.killTweensOf(el);
+        });
         this.messages = [];
         this.messageCount = 0;
         super.destroy();

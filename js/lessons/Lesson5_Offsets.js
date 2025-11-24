@@ -42,6 +42,12 @@ export class Lesson5_Offsets extends Scene {
 
         // Slow down consumer to create lag
         this.consumerDelay = 1.5; // Extra delay before consuming
+
+        // Animation constants
+        this.ANIM_TRAVEL_DURATION = 0.7;
+        this.ANIM_PAUSE_DURATION = 0.2;
+        this.ANIM_CONSUME_DURATION = 0.3;
+        this.MESSAGE_SEND_DELAY = 0.8; // Slower in this lesson
     }
 
     /**
@@ -574,6 +580,11 @@ export class Lesson5_Offsets extends Scene {
      * Cleanup
      */
     destroy() {
+        // Kill all GSAP animations for this scene
+        this.messages.forEach(msg => {
+            const el = this.elements.get(`message-${msg.id || this.messages.indexOf(msg)}`);
+            if (el) gsap.killTweensOf(el);
+        });
         this.messages = [];
         this.messageCount = 0;
         this.latestOffsets = [0];

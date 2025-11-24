@@ -48,6 +48,13 @@ export class Lesson6_Rebalancing extends Scene {
         // Rebalancing state
         this.isRebalancing = false;
         this.rebalancePhase = 0; // 0: 1 consumer, 1: 2 consumers, 2: 3 consumers
+
+        // Animation constants
+        this.ANIM_TRAVEL_DURATION = 0.7;
+        this.ANIM_PAUSE_DURATION = 0.2;
+        this.ANIM_CONSUME_DURATION = 0.3;
+        this.MESSAGE_SEND_DELAY = 0.65;
+        this.REBALANCE_DURATION = 1.5;
     }
 
     /**
@@ -409,8 +416,8 @@ export class Lesson6_Rebalancing extends Scene {
         this.activeConsumerCount = newConsumerCount;
         this.updateRebalanceStatus();
 
-        // Pause for rebalancing
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Pause for rebalancing (matches REBALANCE_DURATION constant)
+        await new Promise(resolve => setTimeout(resolve, this.REBALANCE_DURATION * 1000));
 
         // Update partition assignments based on consumer count
         if (newConsumerCount === 1) {
@@ -499,14 +506,15 @@ export class Lesson6_Rebalancing extends Scene {
                     this.createAndAnimateMessage();
                 }
             }, time);
-            time += 0.65;
+            time += this.MESSAGE_SEND_DELAY;
         }
 
         // Add consumer 2 (rebalance to 2 consumers)
-        timeline.add(async () => {
-            await this.rebalance(2);
+        // Trigger rebalance and ensure timeline accounts for the duration
+        timeline.add(() => {
+            this.rebalance(2);
         }, time);
-        time += 2;
+        time += this.REBALANCE_DURATION;
 
         // Phase 2: 2 consumers (messages 5-9)
         for (let i = 0; i < 5; i++) {
@@ -515,14 +523,14 @@ export class Lesson6_Rebalancing extends Scene {
                     this.createAndAnimateMessage();
                 }
             }, time);
-            time += 0.65;
+            time += this.MESSAGE_SEND_DELAY;
         }
 
         // Add consumer 3 (rebalance to 3 consumers)
-        timeline.add(async () => {
-            await this.rebalance(3);
+        timeline.add(() => {
+            this.rebalance(3);
         }, time);
-        time += 2;
+        time += this.REBALANCE_DURATION;
 
         // Phase 3: 3 consumers (messages 10-14)
         for (let i = 0; i < 5; i++) {
@@ -531,14 +539,14 @@ export class Lesson6_Rebalancing extends Scene {
                     this.createAndAnimateMessage();
                 }
             }, time);
-            time += 0.65;
+            time += this.MESSAGE_SEND_DELAY;
         }
 
         // Remove consumers (rebalance back to 1 consumer)
-        timeline.add(async () => {
-            await this.rebalance(1);
+        timeline.add(() => {
+            this.rebalance(1);
         }, time);
-        time += 2;
+        time += this.REBALANCE_DURATION;
 
         return timeline;
     }
@@ -728,6 +736,11 @@ export class Lesson6_Rebalancing extends Scene {
      * Cleanup
      */
     destroy() {
+        // Kill all GSAP animations for this scene
+        this.messages.forEach(msg => {
+            const el = this.elements.get(`message-${msg.id || this.messages.indexOf(msg)}`);
+            if (el) gsap.killTweensOf(el);
+        });
         this.messages = [];
         this.messageCount = 0;
         this.partitionSequence = [0, 0, 0];
