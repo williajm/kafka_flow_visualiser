@@ -54,7 +54,10 @@ export class Lesson6_Rebalancing extends Scene {
         this.ANIM_PAUSE_DURATION = 0.2;
         this.ANIM_CONSUME_DURATION = 0.3;
         this.MESSAGE_SEND_DELAY = 0.65;
-        this.REBALANCE_DURATION = 2.5; // Longer to see the rebalancing state
+        this.REBALANCE_REAL_DURATION = 2.5; // Real-time duration (seconds)
+        // Timeline duration must account for speed control (max 3x)
+        // So timeline duration = real duration * max speed to ensure it never finishes early
+        this.REBALANCE_TIMELINE_DURATION = 8;
     }
 
     /**
@@ -416,8 +419,8 @@ export class Lesson6_Rebalancing extends Scene {
         this.activeConsumerCount = newConsumerCount;
         this.updateRebalanceStatus();
 
-        // Pause for rebalancing (matches REBALANCE_DURATION constant)
-        await new Promise(resolve => setTimeout(resolve, this.REBALANCE_DURATION * 1000));
+        // Pause for rebalancing (uses real-time, unaffected by timeline speed)
+        await new Promise(resolve => setTimeout(resolve, this.REBALANCE_REAL_DURATION * 1000));
 
         // Update partition assignments based on consumer count
         if (newConsumerCount === 1) {
@@ -510,11 +513,11 @@ export class Lesson6_Rebalancing extends Scene {
         }
 
         // Add consumer 2 (rebalance to 2 consumers)
-        // Trigger rebalance and ensure timeline accounts for the duration
+        // Use longer timeline duration so rebalancing completes even at max speed
         timeline.add(() => {
             this.rebalance(2);
         }, time);
-        time += this.REBALANCE_DURATION;
+        time += this.REBALANCE_TIMELINE_DURATION;
 
         // Phase 2: 2 consumers (messages 7-13)
         for (let i = 0; i < 7; i++) {
@@ -530,7 +533,7 @@ export class Lesson6_Rebalancing extends Scene {
         timeline.add(() => {
             this.rebalance(3);
         }, time);
-        time += this.REBALANCE_DURATION;
+        time += this.REBALANCE_TIMELINE_DURATION;
 
         // Phase 3: 3 consumers (messages 14-20)
         for (let i = 0; i < 7; i++) {
@@ -546,7 +549,7 @@ export class Lesson6_Rebalancing extends Scene {
         timeline.add(() => {
             this.rebalance(1);
         }, time);
-        time += this.REBALANCE_DURATION;
+        time += this.REBALANCE_TIMELINE_DURATION;
 
         return timeline;
     }
