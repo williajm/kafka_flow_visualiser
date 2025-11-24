@@ -768,20 +768,55 @@ export class Lesson6_Rebalancing extends Scene {
             opacity: 1
         });
 
-        // Partition → Consumer
-        tl.to(messageEl, {
-            duration: 0.7,
-            x: consumerPoint.x,
-            y: consumerPoint.y,
-            ease: 'power1.inOut'
-        });
+        // Partition → Consumer (only if not rebalancing)
+        tl.add(() => {
+            if (this.isRebalancing) {
+                // During rebalancing, messages stay at partition
+                // Wait for rebalancing to complete
+                const checkRebalancing = setInterval(() => {
+                    if (!this.isRebalancing) {
+                        clearInterval(checkRebalancing);
+                        // Get updated consumer assignment after rebalancing
+                        const newConsumerIndex = this.partitionAssignments[partitionIndex];
+                        const newConsumer = this.consumers[newConsumerIndex];
+                        const newConsumerPoint = newConsumer.getReceivePoint();
 
-        // Consume
-        tl.to(messageEl, {
-            duration: 0.3,
-            scale: 0,
-            opacity: 0,
-            ease: 'power2.in'
+                        // Now send to the correct consumer
+                        gsap.to(messageEl, {
+                            duration: this.ANIM_TRAVEL_DURATION,
+                            x: newConsumerPoint.x,
+                            y: newConsumerPoint.y,
+                            ease: 'power1.inOut',
+                            onComplete: () => {
+                                // Consume
+                                gsap.to(messageEl, {
+                                    duration: this.ANIM_CONSUME_DURATION,
+                                    scale: 0,
+                                    opacity: 0,
+                                    ease: 'power2.in'
+                                });
+                            }
+                        });
+                    }
+                }, 100);
+            } else {
+                // Not rebalancing, send directly to consumer
+                gsap.to(messageEl, {
+                    duration: this.ANIM_TRAVEL_DURATION,
+                    x: consumerPoint.x,
+                    y: consumerPoint.y,
+                    ease: 'power1.inOut',
+                    onComplete: () => {
+                        // Consume
+                        gsap.to(messageEl, {
+                            duration: this.ANIM_CONSUME_DURATION,
+                            scale: 0,
+                            opacity: 0,
+                            ease: 'power2.in'
+                        });
+                    }
+                });
+            }
         });
     }
 
