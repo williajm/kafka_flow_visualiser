@@ -69,7 +69,7 @@ export class Lesson1_Basics extends Scene {
             topicReceivePoint.x,
             topicReceivePoint.y,
             {
-                stroke: '#2D3561',
+                stroke: '#3D4A3D',
                 'stroke-width': 2,
                 'stroke-dasharray': '5,5',
                 opacity: 0.5
@@ -84,7 +84,7 @@ export class Lesson1_Basics extends Scene {
             consumerPoint.x,
             consumerPoint.y,
             {
-                stroke: '#2D3561',
+                stroke: '#3D4A3D',
                 'stroke-width': 2,
                 'stroke-dasharray': '5,5',
                 opacity: 0.5
@@ -134,7 +134,7 @@ export class Lesson1_Basics extends Scene {
             L ${x - 8} ${y + 6}
         `);
         path.setAttribute('fill', 'none');
-        path.setAttribute('stroke', '#60A5FA');
+        path.setAttribute('stroke', '#7B9E7B');
         path.setAttribute('stroke-width', 2);
         path.setAttribute('stroke-linecap', 'round');
         path.setAttribute('stroke-linejoin', 'round');

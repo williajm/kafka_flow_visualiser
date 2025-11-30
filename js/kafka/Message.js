@@ -29,7 +29,7 @@ export class Message {
         glow.setAttribute('cx', 0);
         glow.setAttribute('cy', 0);
         glow.setAttribute('r', this.radius + 4);
-        glow.setAttribute('fill', '#FBBF24');
+        glow.setAttribute('fill', '#D4A855');
         glow.setAttribute('opacity', '0.3');
 
         // Main message circle - centered at (0, 0) relative to group
@@ -37,7 +37,7 @@ export class Message {
         circle.setAttribute('cx', 0);
         circle.setAttribute('cy', 0);
         circle.setAttribute('r', this.radius);
-        circle.setAttribute('fill', '#FBBF24');
+        circle.setAttribute('fill', '#D4A855');
         circle.setAttribute('opacity', '1');
 
         // Inner highlight
@@ -45,7 +45,7 @@ export class Message {
         highlight.setAttribute('cx', -2);
         highlight.setAttribute('cy', -2);
         highlight.setAttribute('r', 3);
-        highlight.setAttribute('fill', '#FDE68A');
+        highlight.setAttribute('fill', '#E8D4A0');
         highlight.setAttribute('opacity', '0.8');
 
         // Shadow for depth

@@ -43,7 +43,7 @@ export class Lesson6_Rebalancing extends Scene {
         this.roundRobinIndex = 0;
 
         // Message color
-        this.messageColor = '#94A3B8';  // Gray
+        this.messageColor = '#B5AFA5';  // Gray
 
         // Rebalancing state
         this.isRebalancing = false;
@@ -131,7 +131,7 @@ export class Lesson6_Rebalancing extends Scene {
                 brokerPoint.x,
                 brokerPoint.y,
                 {
-                    stroke: '#2D3561',
+                    stroke: '#3D4A3D',
                     'stroke-width': 1,
                     'stroke-dasharray': '3,3',
                     opacity: 0.4
@@ -171,7 +171,7 @@ export class Lesson6_Rebalancing extends Scene {
                 consumerPoint.x,
                 consumerPoint.y,
                 {
-                    stroke: '#34D399',
+                    stroke: '#6B9E9E',
                     'stroke-width': 2,
                     'stroke-dasharray': '5,5',
                     opacity: 0.6
@@ -193,7 +193,7 @@ export class Lesson6_Rebalancing extends Scene {
             {
                 'font-size': '14',
                 'font-weight': '600',
-                'fill': '#E2E8F0',
+                'fill': '#FAF6F0',
                 'text-anchor': 'middle'
             }
         );
@@ -208,8 +208,8 @@ export class Lesson6_Rebalancing extends Scene {
         const y = 80;
 
         const groupBox = this.createRect(x, y, 240, 30, {
-            fill: '#141B3D',
-            stroke: '#34D399',
+            fill: '#1E241E',
+            stroke: '#6B9E9E',
             'stroke-width': 1.5,
             rx: 8,
             opacity: 0.8
@@ -223,7 +223,7 @@ export class Lesson6_Rebalancing extends Scene {
             {
                 'font-size': '10',
                 'font-weight': '600',
-                'fill': '#34D399',
+                'fill': '#6B9E9E',
                 'text-anchor': 'middle'
             }
         );
@@ -241,8 +241,8 @@ export class Lesson6_Rebalancing extends Scene {
         const height = 110;
 
         const box = this.createRect(x, y, width, height, {
-            fill: '#0B122C',
-            stroke: '#2D3561',
+            fill: '#171C17',
+            stroke: '#3D4A3D',
             'stroke-width': 1,
             rx: 10,
             opacity: 0.7
@@ -256,7 +256,7 @@ export class Lesson6_Rebalancing extends Scene {
             {
                 'font-size': '11',
                 'font-weight': '700',
-                'fill': '#E2E8F0',
+                'fill': '#FAF6F0',
                 'text-anchor': 'middle'
             }
         );
@@ -269,7 +269,7 @@ export class Lesson6_Rebalancing extends Scene {
             y + 45,
             {
                 'font-size': '10',
-                'fill': '#94A3B8',
+                'fill': '#B5AFA5',
                 'text-anchor': 'start'
             }
         );
@@ -282,7 +282,7 @@ export class Lesson6_Rebalancing extends Scene {
             {
                 'font-size': '12',
                 'font-weight': '700',
-                'fill': '#34D399',
+                'fill': '#6B9E9E',
                 'text-anchor': 'end'
             }
         );
@@ -295,7 +295,7 @@ export class Lesson6_Rebalancing extends Scene {
             y + 65,
             {
                 'font-size': '10',
-                'fill': '#94A3B8',
+                'fill': '#B5AFA5',
                 'text-anchor': 'start'
             }
         );
@@ -308,7 +308,7 @@ export class Lesson6_Rebalancing extends Scene {
             {
                 'font-size': '13',
                 'font-weight': '700',
-                'fill': '#34D399',
+                'fill': '#6B9E9E',
                 'text-anchor': 'middle'
             }
         );
@@ -321,7 +321,7 @@ export class Lesson6_Rebalancing extends Scene {
             y + 102,
             {
                 'font-size': '8',
-                'fill': '#64748B',
+                'fill': '#7A756C',
                 'text-anchor': 'middle',
                 'font-style': 'italic'
             }
@@ -342,10 +342,10 @@ export class Lesson6_Rebalancing extends Scene {
         if (statusEl) {
             if (this.isRebalancing) {
                 statusEl.textContent = 'Rebalancing...';
-                statusEl.setAttribute('fill', '#FBBF24'); // Yellow
+                statusEl.setAttribute('fill', '#D4A855'); // Yellow
             } else {
                 statusEl.textContent = 'Stable';
-                statusEl.setAttribute('fill', '#34D399'); // Green
+                statusEl.setAttribute('fill', '#6B9E9E'); // Green
             }
         }
     }
@@ -355,8 +355,8 @@ export class Lesson6_Rebalancing extends Scene {
      */
     addTopicContainer() {
         const frame = this.createRect(330, 120, 360, 380, {
-            fill: '#0B122C',
-            stroke: '#2D3561',
+            fill: '#171C17',
+            stroke: '#3D4A3D',
             'stroke-width': 2,
             rx: 12,
             opacity: 0.25
@@ -371,7 +371,7 @@ export class Lesson6_Rebalancing extends Scene {
             {
                 'font-size': '12',
                 'font-weight': '700',
-                'fill': '#CBD5E1',
+                'fill': '#D5D0C8',
                 'text-anchor': 'middle'
             }
         );
@@ -645,8 +645,8 @@ export class Lesson6_Rebalancing extends Scene {
                 this.removeElement(`consumer-badge-label-${i}-${p}`);
 
                 const badge = this.createRect(xOffset, badgeY, badgeWidth, badgeHeight, {
-                    fill: '#0B122C',
-                    stroke: '#34D399',
+                    fill: '#171C17',
+                    stroke: '#6B9E9E',
                     'stroke-width': 1.5,
                     rx: 6,
                     opacity: 0.9
@@ -661,7 +661,7 @@ export class Lesson6_Rebalancing extends Scene {
                     {
                         'font-size': '10',
                         'font-weight': '700',
-                        'fill': '#D1FAE5',
+                        'fill': '#D5E8D5',
                         'text-anchor': 'middle'
                     }
                 );
@@ -741,7 +741,7 @@ export class Lesson6_Rebalancing extends Scene {
         // Color the message
         const circles = messageEl.querySelectorAll('circle');
         circles.forEach(circle => {
-            if (circle.getAttribute('fill') === '#FBBF24') {
+            if (circle.getAttribute('fill') === '#D4A855') {
                 circle.setAttribute('fill', this.messageColor);
             }
         });
@@ -754,7 +754,7 @@ export class Lesson6_Rebalancing extends Scene {
             {
                 'font-size': '8',
                 'font-weight': '700',
-                'fill': '#0A0E27',
+                'fill': '#171C17',
                 'text-anchor': 'middle'
             }
         );
@@ -768,7 +768,7 @@ export class Lesson6_Rebalancing extends Scene {
             {
                 'font-size': '7',
                 'font-weight': '600',
-                'fill': '#0A0E27',
+                'fill': '#171C17',
                 'text-anchor': 'middle'
             }
         );

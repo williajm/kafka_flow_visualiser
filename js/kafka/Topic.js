@@ -37,7 +37,7 @@ export class Topic {
         const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         label.setAttribute('x', this.x + this.width / 2);
         label.setAttribute('y', this.y + this.height + 20);
-        label.setAttribute('fill', '#E2E8F0');
+        label.setAttribute('fill', '#FAF6F0');
         label.setAttribute('font-size', '14');
         label.setAttribute('font-weight', '600');
         label.setAttribute('text-anchor', 'middle');
@@ -78,7 +78,7 @@ export class Topic {
         border.setAttribute('height', this.height);
         border.setAttribute('rx', 12);
         border.setAttribute('fill', 'none');
-        border.setAttribute('stroke', '#60A5FA');
+        border.setAttribute('stroke', '#7B9E7B');
         border.setAttribute('stroke-width', 2);
 
         // Storage lines (to indicate data storage)
@@ -119,9 +119,9 @@ export class Topic {
             partition.setAttribute('width', this.width);
             partition.setAttribute('height', partitionHeight);
             partition.setAttribute('rx', 6);
-            partition.setAttribute('fill', '#3B82F6');
+            partition.setAttribute('fill', '#5C7A5C');
             partition.setAttribute('opacity', '0.8');
-            partition.setAttribute('stroke', '#60A5FA');
+            partition.setAttribute('stroke', '#7B9E7B');
             partition.setAttribute('stroke-width', 2);
 
             group.appendChild(partition);
@@ -141,12 +141,12 @@ export class Topic {
         badge.setAttribute('width', 40);
         badge.setAttribute('height', 20);
         badge.setAttribute('rx', 10);
-        badge.setAttribute('fill', '#22D3EE');
+        badge.setAttribute('fill', '#C4B392');
 
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('x', this.x + this.width - 10);
         text.setAttribute('y', this.y + 5);
-        text.setAttribute('fill', '#0A0E27');
+        text.setAttribute('fill', '#171C17');
         text.setAttribute('font-size', '12');
         text.setAttribute('font-weight', '700');
         text.setAttribute('text-anchor', 'middle');

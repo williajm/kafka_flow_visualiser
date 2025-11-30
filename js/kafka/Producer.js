@@ -42,7 +42,7 @@ export class Producer {
         border.setAttribute('height', this.height);
         border.setAttribute('rx', 12);
         border.setAttribute('fill', 'none');
-        border.setAttribute('stroke', '#A78BFA');
+        border.setAttribute('stroke', '#C2785C');
         border.setAttribute('stroke-width', 2);
 
         // Icon (simplified producer symbol)
