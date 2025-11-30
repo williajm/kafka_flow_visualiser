@@ -161,7 +161,7 @@ export class Animator {
      * @param {string} color - Glow color
      * @returns {gsap.core.Tween}
      */
-    pulseGlow(element, color = '#FBBF24') {
+    pulseGlow(element, color = '#D4A855') {
         return gsap.to(element, {
             duration: 0.8,
             filter: `drop-shadow(0 0 12px ${color})`,

@@ -31,16 +31,16 @@ export class Broker {
         rect.setAttribute('width', this.width);
         rect.setAttribute('height', this.height);
         rect.setAttribute('rx', 8);
-        rect.setAttribute('fill', '#1E2749');
+        rect.setAttribute('fill', '#282F28');
         rect.setAttribute('opacity', '0.6');
-        rect.setAttribute('stroke', '#2D3561');
+        rect.setAttribute('stroke', '#3D4A3D');
         rect.setAttribute('stroke-width', 1);
 
         // Broker label
         const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         label.setAttribute('x', this.x + this.width / 2);
         label.setAttribute('y', this.y + 15);
-        label.setAttribute('fill', '#94A3B8');
+        label.setAttribute('fill', '#B5AFA5');
         label.setAttribute('font-size', '10');
         label.setAttribute('font-weight', '600');
         label.setAttribute('text-anchor', 'middle');
@@ -53,9 +53,9 @@ export class Broker {
         partitionRect.setAttribute('width', this.width - 20);
         partitionRect.setAttribute('height', 50);
         partitionRect.setAttribute('rx', 6);
-        partitionRect.setAttribute('fill', '#3B82F6');
+        partitionRect.setAttribute('fill', '#5C7A5C');
         partitionRect.setAttribute('opacity', '0.8');
-        partitionRect.setAttribute('stroke', '#60A5FA');
+        partitionRect.setAttribute('stroke', '#7B9E7B');
         partitionRect.setAttribute('stroke-width', 2);
 
         // Partition label

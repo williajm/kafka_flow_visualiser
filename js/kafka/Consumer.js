@@ -43,7 +43,7 @@ export class Consumer {
         border.setAttribute('height', this.height);
         border.setAttribute('rx', 12);
         border.setAttribute('fill', 'none');
-        border.setAttribute('stroke', '#34D399');
+        border.setAttribute('stroke', '#6B9E9E');
         border.setAttribute('stroke-width', 2);
 
         // Icon (simplified consumer symbol)

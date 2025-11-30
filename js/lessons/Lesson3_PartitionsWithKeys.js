@@ -51,9 +51,9 @@ export class Lesson3_PartitionsWithKeys extends Scene {
         };
 
         this.keyColors = {
-            'user-A': '#22D3EE',  // Cyan
-            'user-B': '#FBBF24',  // Yellow
-            'user-C': '#F472B6'   // Pink
+            'user-A': '#C4B392',  // Cyan
+            'user-B': '#D4A855',  // Yellow
+            'user-C': '#C2785C'   // Pink
         };
 
         // Animation constants
@@ -131,7 +131,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
                 brokerPoint.x,
                 brokerPoint.y,
                 {
-                    stroke: '#2D3561',
+                    stroke: '#3D4A3D',
                     'stroke-width': 1,
                     'stroke-dasharray': '3,3',
                     opacity: 0.4
@@ -150,7 +150,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
                 consumerPoint.x,
                 consumerPoint.y,
                 {
-                    stroke: '#2D3561',
+                    stroke: '#3D4A3D',
                     'stroke-width': 1,
                     'stroke-dasharray': '3,3',
                     opacity: 0.4
@@ -172,7 +172,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
             {
                 'font-size': '14',
                 'font-weight': '600',
-                'fill': '#E2E8F0',
+                'fill': '#FAF6F0',
                 'text-anchor': 'middle'
             }
         );
@@ -184,8 +184,8 @@ export class Lesson3_PartitionsWithKeys extends Scene {
      */
     addTopicContainer() {
         const frame = this.createRect(330, 90, 360, 380, {
-            fill: '#0B122C',
-            stroke: '#2D3561',
+            fill: '#171C17',
+            stroke: '#3D4A3D',
             'stroke-width': 2,
             rx: 12,
             opacity: 0.25
@@ -200,7 +200,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
             {
                 'font-size': '12',
                 'font-weight': '700',
-                'fill': '#CBD5E1',
+                'fill': '#D5D0C8',
                 'text-anchor': 'middle'
             }
         );
@@ -223,7 +223,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
             {
                 'font-size': '11',
                 'font-weight': '600',
-                'fill': '#E2E8F0',
+                'fill': '#FAF6F0',
                 'text-anchor': 'start'
             }
         );
@@ -244,7 +244,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
                 yPos + 4,
                 {
                     'font-size': '10',
-                    'fill': '#94A3B8',
+                    'fill': '#B5AFA5',
                     'text-anchor': 'start'
                 }
             );
@@ -257,7 +257,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
                 yPos + 4,
                 {
                     'font-size': '10',
-                    'fill': '#22D3EE',
+                    'fill': '#C4B392',
                     'text-anchor': 'start'
                 }
             );
@@ -271,7 +271,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
             y + 75,
             {
                 'font-size': '9',
-                'fill': '#64748B',
+                'fill': '#7A756C',
                 'text-anchor': 'start',
                 'font-style': 'italic'
             }
@@ -284,7 +284,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
             y + 90,
             {
                 'font-size': '8',
-                'fill': '#64748B',
+                'fill': '#7A756C',
                 'text-anchor': 'start',
                 'font-style': 'italic'
             }
@@ -302,8 +302,8 @@ export class Lesson3_PartitionsWithKeys extends Scene {
 
             // History box background
             const historyBox = this.createRect(historyX, historyY, 150, 90, {
-                fill: '#141B3D',
-                stroke: '#2D3561',
+                fill: '#1E241E',
+                stroke: '#3D4A3D',
                 'stroke-width': 1,
                 rx: 6,
                 opacity: 0.8
@@ -317,7 +317,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
                 historyY + 15,
                 {
                     'font-size': '9',
-                    'fill': '#94A3B8',
+                    'fill': '#B5AFA5',
                     'text-anchor': 'middle'
                 }
             );
@@ -333,7 +333,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
                     msgY,
                     {
                         'font-size': '10',
-                        'fill': '#64748B',
+                        'fill': '#7A756C',
                         'text-anchor': 'middle',
                         'font-family': 'monospace'
                     }
@@ -353,8 +353,8 @@ export class Lesson3_PartitionsWithKeys extends Scene {
         const height = 110;
 
         const box = this.createRect(x, y, width, height, {
-            fill: '#0B122C',
-            stroke: '#2D3561',
+            fill: '#171C17',
+            stroke: '#3D4A3D',
             'stroke-width': 1,
             rx: 10,
             opacity: 0.7
@@ -368,7 +368,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
             {
                 'font-size': '11',
                 'font-weight': '700',
-                'fill': '#E2E8F0',
+                'fill': '#FAF6F0',
                 'text-anchor': 'middle'
             }
         );
@@ -383,7 +383,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
                 {
                     'font-size': '10',
                     'font-weight': '700',
-                    'fill': '#60A5FA',
+                    'fill': '#7B9E7B',
                     'text-anchor': 'start'
                 }
             );
@@ -399,7 +399,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
             this.addElement(`load-bar-bg-${i}`, barBg);
 
             const barFill = this.createRect(x + 34, rowY, 10, 12, {
-                fill: '#22D3EE',
+                fill: '#C4B392',
                 rx: 6,
                 opacity: 0.9
             });
@@ -412,7 +412,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
             y + height - 10,
             {
                 'font-size': '9',
-                'fill': '#94A3B8',
+                'fill': '#B5AFA5',
                 'text-anchor': 'middle'
             }
         );
@@ -455,7 +455,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
                     msgElement.setAttribute('opacity', '1');
                 } else {
                     msgElement.textContent = '—';
-                    msgElement.setAttribute('fill', '#64748B');
+                    msgElement.setAttribute('fill', '#7A756C');
                     msgElement.setAttribute('opacity', '0.5');
                 }
             }
@@ -552,8 +552,8 @@ export class Lesson3_PartitionsWithKeys extends Scene {
                 const badgeWidth = 30;
                 const xOffset = badgeX + idx * (badgeWidth + 4);
                 const badge = this.createRect(xOffset, badgeY, badgeWidth, badgeHeight, {
-                    fill: '#0B122C',
-                    stroke: '#34D399',
+                    fill: '#171C17',
+                    stroke: '#6B9E9E',
                     'stroke-width': 1.5,
                     rx: 6,
                     opacity: 0.9
@@ -602,7 +602,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
         // Color the message
         const circles = messageEl.querySelectorAll('circle');
         circles.forEach(circle => {
-            if (circle.getAttribute('fill') === '#FBBF24') {
+            if (circle.getAttribute('fill') === '#D4A855') {
                 circle.setAttribute('fill', messageColor);
             }
         });
@@ -617,7 +617,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
             {
                 'font-size': '8',
                 'font-weight': '700',
-                'fill': '#0A0E27',
+                'fill': '#171C17',
                 'text-anchor': 'middle'
             }
         );
@@ -631,7 +631,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
             {
                 'font-size': '7',
                 'font-weight': '600',
-                'fill': '#0A0E27',
+                'fill': '#171C17',
                 'text-anchor': 'middle'
             }
         );
@@ -745,7 +745,7 @@ export class Lesson3_PartitionsWithKeys extends Scene {
         const barFill = this.getElement(`load-bar-fill-${partitionIndex}`);
         if (barFill) {
             barFill.setAttribute('width', barWidth);
-            barFill.setAttribute('fill', load > 3 ? '#F59E0B' : '#22D3EE');
+            barFill.setAttribute('fill', load > 3 ? '#F59E0B' : '#C4B392');
         }
     }
 }

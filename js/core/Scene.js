@@ -157,7 +157,7 @@ export class Scene {
         textEl.textContent = text;
         textEl.setAttribute('x', x);
         textEl.setAttribute('y', y);
-        textEl.setAttribute('fill', '#E2E8F0');
+        textEl.setAttribute('fill', '#FAF6F0');
         textEl.setAttribute('font-family', 'inherit');
         textEl.setAttribute('text-anchor', 'middle');
 
