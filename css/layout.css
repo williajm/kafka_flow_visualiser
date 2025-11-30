@@ -206,8 +206,8 @@
 .main-content {
     position: relative;
     overflow: hidden;
-    background: radial-gradient(ellipse at top, rgba(52, 211, 153, 0.04), transparent 50%),
-                radial-gradient(ellipse at bottom, rgba(245, 158, 11, 0.03), transparent 50%);
+    background: radial-gradient(ellipse at top, rgba(123, 158, 123, 0.04), transparent 50%),
+                radial-gradient(ellipse at bottom, rgba(194, 120, 92, 0.03), transparent 50%);
 }
 
 .canvas-container {
@@ -237,7 +237,7 @@
     top: var(--spacing-xl);
     left: var(--spacing-xl);
     max-width: 400px;
-    background-color: rgba(18, 26, 22, 0.95);
+    background-color: rgba(30, 36, 30, 0.95);
     backdrop-filter: blur(12px);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
