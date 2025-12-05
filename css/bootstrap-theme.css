@@ -449,10 +449,62 @@
         left: 0;
     }
 
+    /* Fix heights - swap vh/vw since we're rotated */
+    .kafka-main-row,
+    .kafka-main-content,
+    .kafka-canvas-container {
+        min-height: calc(100vw - 58px) !important;
+    }
+
+    .kafka-sidebar {
+        height: calc(100vw - 58px) !important;
+    }
+
+    /* Make canvas fill available space */
+    .kafka-canvas-container {
+        padding: 0.5rem !important;
+    }
+
+    .kafka-visualization-canvas {
+        max-height: calc(100vw - 80px) !important;
+    }
+
+    /* Compact lesson description for mobile landscape */
+    .kafka-lesson-description {
+        top: 0.5rem !important;
+        left: 0.5rem !important;
+        right: auto !important;
+        max-width: 280px !important;
+    }
+
+    .kafka-description-card .card-body {
+        padding: 0.5rem !important;
+    }
+
+    .kafka-lesson-title {
+        font-size: 0.9rem !important;
+    }
+
+    .kafka-lesson-text {
+        font-size: 0.75rem !important;
+    }
+
     /* Adjust controls position for rotated view */
     .kafka-controls {
-        bottom: 1rem !important;
-        right: 1rem !important;
+        bottom: 0.5rem !important;
+        right: 0.5rem !important;
         left: auto !important;
+        padding: 0.5rem !important;
+    }
+
+    /* Hide navbar on rotated mobile to maximize space */
+    .kafka-navbar {
+        display: none !important;
+    }
+
+    .kafka-main-row,
+    .kafka-main-content,
+    .kafka-canvas-container {
+        min-height: 100vw !important;
     }
 }
