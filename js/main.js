@@ -117,6 +117,9 @@ class KafkaFlowVisualizer {
         this.currentScene = new LessonClass(this.canvas);
         await this.currentScene.init();
 
+        // Apply current speed setting to the new scene
+        this.currentScene.setSpeed(this.controls.speed);
+
         // Re-enable controls
         this.controls.enable();
 
