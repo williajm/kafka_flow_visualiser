@@ -263,7 +263,7 @@ export class Lesson2_Partitions extends Scene {
         // Position relative to producer (below it with spacing)
         const x = this.producer.x;
         const y = this.producer.y + this.producer.height + 60;
-        const width = 300;
+        const width = 220;
         const height = 110;
 
         const box = this.createRect(x, y, width, height, {
@@ -276,7 +276,7 @@ export class Lesson2_Partitions extends Scene {
         this.addElement('load-box', box);
 
         const title = this.createText(
-            'Broker Load Distribution (in-flight per partition)',
+            'Partition Load (in-flight)',
             x + width / 2,
             y + 18,
             {
