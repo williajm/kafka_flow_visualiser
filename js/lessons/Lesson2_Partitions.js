@@ -261,7 +261,7 @@ export class Lesson2_Partitions extends Scene {
      */
     addLoadIndicator() {
         const x = 720;
-        const y = 500;
+        const y = 460;
         const width = 380;
         const height = 110;
 
