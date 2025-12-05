@@ -106,7 +106,6 @@ export class Lesson3_PartitionsWithKeys extends Scene {
         // Add visual elements
         this.createConnectionLines();
         this.addLabels();
-        this.addLegend();
         this.addConsumerPartitionBadges();
         this.addConsumerHistoryDisplays();
         this.addLoadIndicator();
@@ -206,78 +205,6 @@ export class Lesson3_PartitionsWithKeys extends Scene {
         );
         label.setAttribute('pointer-events', 'none');
         this.addElement('topic-label', label);
-    }
-
-    /**
-     * Add legend
-     */
-    addLegend() {
-        // Position relative to producer (above it, aligned horizontally)
-        const x = this.producer.x;
-        const y = this.producer.y - 160;
-
-        // Keyed mode legend
-        const title = this.createText(
-            'Message Keys:',
-            x,
-            y,
-            {
-                'font-size': '11',
-                'font-weight': '600',
-                'fill': '#FAF6F0',
-                'text-anchor': 'start'
-            }
-        );
-        this.addElement('legend-title', title);
-
-        Object.entries(this.keyColors).forEach(([key, color], i) => {
-            const yPos = y + 18 + (i * 18);
-
-            const circle = this.createCircle(x + 5, yPos, 4, {
-                fill: color,
-                opacity: 0.9
-            });
-            this.addElement(`legend-circle-${key}`, circle);
-
-            const label = this.createText(
-                key,
-                x + 15,
-                yPos + 4,
-                {
-                    'font-size': '10',
-                    'fill': '#B5AFA5',
-                    'text-anchor': 'start'
-                }
-            );
-            this.addElement(`legend-label-${key}`, label);
-
-            const partition = this.keyToPartition[key];
-            const partLabel = this.createText(
-                `→ P${partition}`,
-                x + 65,
-                yPos + 4,
-                {
-                    'font-size': '10',
-                    'fill': '#C4B392',
-                    'text-anchor': 'start'
-                }
-            );
-            this.addElement(`legend-part-${key}`, partLabel);
-        });
-
-        // Explanation note
-        const note1 = this.createText(
-            'Watch: Same key → same partition → ordered!',
-            x,
-            y + 75,
-            {
-                'font-size': '9',
-                'fill': '#7A756C',
-                'text-anchor': 'start',
-                'font-style': 'italic'
-            }
-        );
-        this.addElement('legend-note-1', note1);
     }
 
     /**
