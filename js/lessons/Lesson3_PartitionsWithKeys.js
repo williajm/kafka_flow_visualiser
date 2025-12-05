@@ -212,8 +212,9 @@ export class Lesson3_PartitionsWithKeys extends Scene {
      * Add legend
      */
     addLegend() {
-        const x = 80;
-        const y = 80;
+        // Position relative to producer (above it, aligned horizontally)
+        const x = this.producer.x;
+        const y = this.producer.y - 160;
 
         // Keyed mode legend
         const title = this.createText(
@@ -347,9 +348,10 @@ export class Lesson3_PartitionsWithKeys extends Scene {
      * Add load indicator showing broker load distribution (in-flight messages per broker/partition)
      */
     addLoadIndicator() {
-        const x = 720;
-        const y = 460;
-        const width = 380;
+        // Position relative to producer (below it with spacing)
+        const x = this.producer.x;
+        const y = this.producer.y + this.producer.height + 60;
+        const width = 300;
         const height = 110;
 
         const box = this.createRect(x, y, width, height, {

@@ -260,9 +260,10 @@ export class Lesson2_Partitions extends Scene {
      * Add load indicator showing broker load distribution (in-flight messages per broker/partition)
      */
     addLoadIndicator() {
-        const x = 720;
-        const y = 460;
-        const width = 380;
+        // Position relative to producer (below it with spacing)
+        const x = this.producer.x;
+        const y = this.producer.y + this.producer.height + 60;
+        const width = 300;
         const height = 110;
 
         const box = this.createRect(x, y, width, height, {

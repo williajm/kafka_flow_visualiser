@@ -180,8 +180,9 @@ export class Lesson4_ConsumerGroups extends Scene {
      * Add consumer group label
      */
     addConsumerGroupLabel() {
-        const x = 900;
-        const y = 110;
+        // Position relative to first consumer (above it)
+        const x = this.consumers[0].x;
+        const y = this.consumers[0].y - 50;
 
         const groupBox = this.createRect(x, y, 180, 30, {
             fill: '#1E241E',
@@ -290,8 +291,9 @@ export class Lesson4_ConsumerGroups extends Scene {
      * Add load indicator showing consumer load distribution
      */
     addLoadIndicator() {
-        const x = 80;
-        const y = 380;
+        // Position relative to producer (below it with spacing)
+        const x = this.producer.x;
+        const y = this.producer.y + this.producer.height + 70;
         const width = 220;
         const height = 110;
 
