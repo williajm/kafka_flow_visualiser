@@ -433,6 +433,15 @@
 }
 
 /* ============================================
+   Floating Menu Button (hidden by default)
+   ============================================ */
+
+.kafka-floating-menu-btn {
+    display: none;
+    z-index: 100;
+}
+
+/* ============================================
    Force Landscape on Mobile
    Rotate content 90° when phone is in portrait
    ============================================ */
@@ -472,9 +481,9 @@
     /* Compact lesson description for mobile landscape */
     .kafka-lesson-description {
         top: 0.5rem !important;
-        left: 0.5rem !important;
+        left: 3rem !important;
         right: auto !important;
-        max-width: 280px !important;
+        max-width: 250px !important;
     }
 
     .kafka-description-card .card-body {
@@ -506,5 +515,28 @@
     .kafka-main-content,
     .kafka-canvas-container {
         min-height: 100vw !important;
+    }
+
+    /* Show floating menu button when navbar is hidden */
+    .kafka-floating-menu-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        top: 0.5rem;
+        left: 0.5rem;
+        width: 40px;
+        height: 40px;
+        background-color: rgba(30, 36, 30, 0.95) !important;
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--border-color) !important;
+        border-radius: var(--radius-md) !important;
+        color: var(--text-secondary) !important;
+        box-shadow: var(--shadow-md);
+    }
+
+    .kafka-floating-menu-btn:hover,
+    .kafka-floating-menu-btn:focus {
+        background-color: var(--bg-surface-light) !important;
+        color: var(--text-primary) !important;
     }
 }
