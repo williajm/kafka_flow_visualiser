@@ -431,3 +431,28 @@
 .kafka-controls .btn-group > .btn:not(:last-child) {
     margin-right: 4px;
 }
+
+/* ============================================
+   Force Landscape on Mobile
+   Rotate content 90° when phone is in portrait
+   ============================================ */
+
+@media screen and (max-width: 896px) and (orientation: portrait) {
+    html {
+        transform: rotate(-90deg);
+        transform-origin: left top;
+        width: 100vh;
+        height: 100vw;
+        overflow-x: hidden;
+        position: absolute;
+        top: 100%;
+        left: 0;
+    }
+
+    /* Adjust controls position for rotated view */
+    .kafka-controls {
+        bottom: 1rem !important;
+        right: 1rem !important;
+        left: auto !important;
+    }
+}
