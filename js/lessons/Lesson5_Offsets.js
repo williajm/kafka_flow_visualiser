@@ -178,8 +178,9 @@ export class Lesson5_Offsets extends Scene {
      * Add offset display showing latest and consumer offsets
      */
     addOffsetDisplay() {
-        const x = 80;
-        const y = 380;
+        // Position relative to producer (below it with spacing)
+        const x = this.producer.x;
+        const y = this.producer.y + this.producer.height + 10;
         const width = 260;
         const height = 110;
 
@@ -276,8 +277,9 @@ export class Lesson5_Offsets extends Scene {
      * Add lag indicator
      */
     addLagIndicator() {
-        const x = 720;
-        const y = 380;
+        // Position relative to consumer (below and to the left)
+        const x = this.consumers[0].x - 180;
+        const y = this.consumers[0].y + this.consumers[0].height + 10;
         const width = 380;
         const height = 110;
 

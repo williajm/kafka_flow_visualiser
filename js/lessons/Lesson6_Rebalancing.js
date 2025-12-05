@@ -204,8 +204,9 @@ export class Lesson6_Rebalancing extends Scene {
      * Add consumer group label
      */
     addConsumerGroupLabel() {
-        const x = 900;
-        const y = 80;
+        // Position relative to first consumer (above it)
+        const x = this.consumers[0].x;
+        const y = this.consumers[0].y - 80;
 
         const groupBox = this.createRect(x, y, 240, 30, {
             fill: '#1E241E',
@@ -234,8 +235,9 @@ export class Lesson6_Rebalancing extends Scene {
      * Add rebalancing status indicator
      */
     addRebalanceStatus() {
-        const x = 80;
-        const y = 380;
+        // Position relative to producer (below it with spacing)
+        const x = this.producer.x;
+        const y = this.producer.y + this.producer.height + 60;
         const width = 220;
         // Taller box so all status text stays within the frame
         const height = 110;
