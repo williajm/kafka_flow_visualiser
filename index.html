@@ -23,6 +23,11 @@
     <!-- Header -->
     <header class="header">
         <div class="header-content">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open lessons menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12h18M3 6h18M3 18h18"/>
+                </svg>
+            </button>
             <h1 class="logo">Kafka Flow Visualizer</h1>
             <nav class="header-nav">
                 <a href="https://github.com/williajm/kafka_flow_visualiser" target="_blank" class="nav-link">
@@ -37,6 +42,9 @@
 
     <!-- Main Container -->
     <div class="container">
+        <!-- Sidebar Overlay (for mobile) -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar">
             <nav class="lesson-nav">
