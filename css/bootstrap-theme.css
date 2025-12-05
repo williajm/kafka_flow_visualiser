@@ -1,0 +1,427 @@
+/* ============================================
+   Kafka Flow Visualizer - Bootstrap Theme Overrides
+   Applies Organic Earth theme to Bootstrap components
+   ============================================ */
+
+/* ============================================
+   Bootstrap CSS Variable Overrides
+   ============================================ */
+
+[data-bs-theme="dark"] {
+    --bs-body-bg: var(--bg-primary);
+    --bs-body-color: var(--text-primary);
+    --bs-secondary-bg: var(--bg-surface);
+    --bs-tertiary-bg: var(--bg-surface-light);
+    --bs-border-color: var(--border-color);
+    --bs-emphasis-color: var(--text-primary);
+    --bs-secondary-color: var(--text-secondary);
+    --bs-tertiary-color: var(--text-muted);
+    --bs-link-color: var(--color-topic-start);
+    --bs-link-hover-color: var(--color-topic-end);
+    --bs-primary-rgb: 123, 158, 123;
+    --bs-success-rgb: 123, 158, 123;
+    --bs-warning-rgb: 212, 168, 85;
+    --bs-danger-rgb: 194, 120, 92;
+}
+
+/* ============================================
+   Navbar - Kafka Theme
+   ============================================ */
+
+.kafka-navbar {
+    background-color: var(--bg-surface) !important;
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.75rem 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.kafka-logo {
+    font-size: 1.25rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--color-topic-start), var(--color-producer-start));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.kafka-menu-btn {
+    border-color: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+    padding: 0.5rem;
+}
+
+.kafka-menu-btn:hover,
+.kafka-menu-btn:focus {
+    background-color: var(--bg-surface-light) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.kafka-github-btn {
+    border-color: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+    font-size: 0.875rem;
+}
+
+.kafka-github-btn:hover {
+    background-color: var(--bg-surface-light) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ============================================
+   Offcanvas - Lessons Sidebar
+   ============================================ */
+
+.kafka-offcanvas {
+    background-color: var(--bg-surface) !important;
+    border-right: 1px solid var(--border-color) !important;
+    width: 280px !important;
+}
+
+.kafka-offcanvas .offcanvas-header {
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 1.25rem;
+}
+
+/* ============================================
+   Desktop Sidebar
+   ============================================ */
+
+.kafka-sidebar {
+    background-color: var(--bg-surface);
+    border-right: 1px solid var(--border-color);
+    height: calc(100vh - 58px);
+    overflow-y: auto;
+    position: sticky;
+    top: 58px;
+}
+
+/* ============================================
+   Lesson List - Shared styles for both sidebars
+   ============================================ */
+
+.kafka-lesson-list {
+    background-color: transparent !important;
+}
+
+.kafka-lesson-item {
+    display: grid !important;
+    grid-template-columns: 36px 1fr auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-left: 3px solid transparent !important;
+    border-radius: 0 !important;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    color: var(--text-primary) !important;
+}
+
+.kafka-lesson-item:hover:not(.locked) {
+    background-color: var(--bg-surface-light) !important;
+}
+
+.kafka-lesson-item.active {
+    background-color: var(--bg-surface-light) !important;
+    border-left-color: var(--color-topic-start) !important;
+}
+
+.kafka-lesson-item.locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.kafka-lesson-number {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-primary);
+    border-radius: 50%;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.kafka-lesson-item.active .kafka-lesson-number {
+    background: linear-gradient(135deg, var(--color-topic-end), var(--color-producer-end));
+    color: white;
+}
+
+.kafka-lesson-name {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.kafka-lesson-status {
+    color: var(--color-success);
+    font-size: 0.75rem;
+}
+
+/* ============================================
+   Main Content Area
+   ============================================ */
+
+.kafka-main-row {
+    min-height: calc(100vh - 58px);
+}
+
+.kafka-main-content {
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(ellipse at top, rgba(123, 158, 123, 0.04), transparent 50%),
+                radial-gradient(ellipse at bottom, rgba(194, 120, 92, 0.03), transparent 50%);
+    min-height: calc(100vh - 58px);
+}
+
+.kafka-canvas-container {
+    width: 100%;
+    height: 100%;
+    min-height: calc(100vh - 58px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    position: relative;
+}
+
+@media (min-width: 992px) {
+    .kafka-canvas-container {
+        padding: 2rem;
+    }
+}
+
+.kafka-visualization-canvas {
+    width: 100%;
+    height: 100%;
+    max-width: 1200px;
+    max-height: 600px;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+/* ============================================
+   Lesson Description Card
+   ============================================ */
+
+.kafka-lesson-description {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    max-width: none;
+    z-index: 10;
+}
+
+@media (min-width: 992px) {
+    .kafka-lesson-description {
+        top: 2rem;
+        left: 2rem;
+        right: auto;
+        max-width: 400px;
+    }
+}
+
+.kafka-description-card {
+    background-color: rgba(30, 36, 30, 0.95) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-lg);
+}
+
+.kafka-description-card .card-body {
+    padding: 1rem;
+}
+
+@media (min-width: 992px) {
+    .kafka-description-card .card-body {
+        padding: 1.25rem;
+    }
+}
+
+.kafka-lesson-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary) !important;
+}
+
+@media (min-width: 992px) {
+    .kafka-lesson-title {
+        font-size: 1.25rem;
+    }
+}
+
+.kafka-lesson-text {
+    color: var(--text-secondary) !important;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+@media (min-width: 992px) {
+    .kafka-lesson-text {
+        font-size: 0.9375rem;
+    }
+}
+
+.kafka-collapse-btn {
+    color: var(--text-muted) !important;
+    transition: transform var(--transition-fast);
+}
+
+.kafka-collapse-btn[aria-expanded="false"] .kafka-chevron {
+    transform: rotate(180deg);
+}
+
+/* ============================================
+   Info Panel (Offcanvas)
+   ============================================ */
+
+.kafka-info-panel {
+    background-color: var(--bg-surface) !important;
+    border-left: 1px solid var(--border-color) !important;
+    width: 100% !important;
+    max-width: 400px;
+}
+
+.kafka-info-panel .offcanvas-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* ============================================
+   Control Panel (Floating)
+   ============================================ */
+
+.kafka-controls {
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+    background-color: rgba(30, 36, 30, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    box-shadow: var(--shadow-xl);
+    z-index: 90;
+    transition: all var(--transition-base);
+}
+
+@media (min-width: 576px) {
+    .kafka-controls {
+        left: auto;
+        right: 1.5rem;
+        bottom: 1.5rem;
+        flex-wrap: nowrap;
+    }
+}
+
+.kafka-controls:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 24px 32px -6px rgba(0, 0, 0, 0.7);
+}
+
+.kafka-control-btn {
+    width: 44px;
+    height: 44px;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-surface-light) !important;
+    border: none !important;
+    color: var(--text-secondary) !important;
+    border-radius: var(--radius-md) !important;
+    transition: all var(--transition-fast);
+}
+
+.kafka-control-btn:hover {
+    background-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+    transform: scale(1.05);
+}
+
+.kafka-control-btn:active {
+    transform: scale(0.95);
+}
+
+.kafka-control-btn-primary {
+    background: linear-gradient(135deg, var(--color-topic-end), var(--color-producer-end)) !important;
+    color: white !important;
+}
+
+.kafka-control-btn-primary:hover {
+    background: linear-gradient(135deg, var(--color-topic-start), var(--color-producer-start)) !important;
+    box-shadow: 0 0 24px rgba(123, 158, 123, 0.35);
+    color: white !important;
+}
+
+.kafka-speed-control {
+    width: 100%;
+}
+
+@media (min-width: 576px) {
+    .kafka-speed-control {
+        width: auto;
+        border-left: 1px solid var(--border-color);
+        padding-left: 0.75rem;
+        margin-left: 0.25rem;
+    }
+}
+
+.kafka-speed-slider {
+    width: 80px;
+    height: 4px;
+    background: var(--bg-surface-light);
+    padding: 0;
+}
+
+.kafka-speed-slider::-webkit-slider-thumb {
+    width: 16px;
+    height: 16px;
+    background: linear-gradient(135deg, var(--color-topic-start), var(--color-producer-start));
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.kafka-speed-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: linear-gradient(135deg, var(--color-topic-start), var(--color-producer-start));
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.kafka-speed-value {
+    min-width: 28px;
+    text-align: center;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+}
+
+/* ============================================
+   Utility Overrides
+   ============================================ */
+
+.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Hide default button group borders */
+.kafka-controls .btn-group > .btn {
+    border: none !important;
+}
+
+.kafka-controls .btn-group > .btn:not(:last-child) {
+    margin-right: 4px;
+}

@@ -1,15 +1,15 @@
 /**
  * InfoPanel - Side panel for displaying detailed information
- * Slides in when user clicks on Kafka components
+ * Uses Bootstrap offcanvas component
  */
 
 import { eventBus } from '../core/EventBus.js';
 
 export class InfoPanel {
     constructor() {
-        this.panel = document.getElementById('infoPanel');
-        this.closeBtn = document.getElementById('infoPanelClose');
+        this.panelEl = document.getElementById('infoPanel');
         this.content = document.getElementById('infoPanelContent');
+        this.offcanvas = null;
         this.isOpen = false;
 
         this.init();
@@ -19,16 +19,19 @@ export class InfoPanel {
      * Initialize event listeners
      */
     init() {
-        this.closeBtn.addEventListener('click', () => {
-            this.close();
-        });
+        // Initialize Bootstrap offcanvas instance
+        if (typeof bootstrap !== 'undefined' && this.panelEl) {
+            this.offcanvas = bootstrap.Offcanvas.getOrCreateInstance(this.panelEl);
 
-        // Close on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.isOpen) {
-                this.close();
-            }
-        });
+            // Track open/close state
+            this.panelEl.addEventListener('shown.bs.offcanvas', () => {
+                this.isOpen = true;
+            });
+
+            this.panelEl.addEventListener('hidden.bs.offcanvas', () => {
+                this.isOpen = false;
+            });
+        }
 
         // Listen for entity click events
         eventBus.on('entity:click', (data) => {
@@ -42,16 +45,18 @@ export class InfoPanel {
      */
     show(data) {
         this.content.innerHTML = this.renderContent(data);
-        this.panel.classList.add('open');
-        this.isOpen = true;
+        if (this.offcanvas) {
+            this.offcanvas.show();
+        }
     }
 
     /**
      * Close info panel
      */
     close() {
-        this.panel.classList.remove('open');
-        this.isOpen = false;
+        if (this.offcanvas) {
+            this.offcanvas.hide();
+        }
     }
 
     /**
@@ -63,18 +68,18 @@ export class InfoPanel {
         const { type, title, description, details } = data;
 
         let html = `
-            <div class="badge badge-${type.toLowerCase()}">${type}</div>
-            <h3 style="margin-top: 1rem;">${title}</h3>
-            <p>${description}</p>
+            <div class="badge badge-${type.toLowerCase()} mb-3">${type}</div>
+            <h4 class="mb-3">${title}</h4>
+            <p class="text-secondary">${description}</p>
         `;
 
         if (details) {
-            html += '<div style="margin-top: 2rem;">';
+            html += '<div class="mt-4">';
             for (const [label, value] of Object.entries(details)) {
                 html += `
-                    <div style="margin-bottom: 1rem;">
-                        <div class="info-label">${label}</div>
-                        <div class="info-value">${value}</div>
+                    <div class="mb-3">
+                        <div class="text-uppercase small text-muted fw-semibold mb-1">${label}</div>
+                        <div class="fs-5 fw-semibold" style="font-family: var(--font-mono);">${value}</div>
                     </div>
                 `;
             }
@@ -99,8 +104,8 @@ export class InfoPanel {
      */
     getProducerExample() {
         return `
-            <div style="margin-top: 2rem;">
-                <div class="info-label">Example Code</div>
+            <div class="mt-4">
+                <div class="text-uppercase small text-muted fw-semibold mb-2">Example Code</div>
                 <div class="code-block">
                     <code>// Send message to topic
 producer.send({
@@ -120,9 +125,9 @@ producer.send({
      */
     getTopicExample() {
         return `
-            <div style="margin-top: 2rem;">
-                <div class="info-label">Key Concepts</div>
-                <p style="font-size: 0.875rem; color: var(--text-secondary);">
+            <div class="mt-4">
+                <div class="text-uppercase small text-muted fw-semibold mb-2">Key Concepts</div>
+                <p class="small text-secondary">
                     Topics are divided into <strong>partitions</strong> for parallel processing.
                     Messages with the same key go to the same partition, preserving order.
                 </p>
@@ -136,8 +141,8 @@ producer.send({
      */
     getConsumerExample() {
         return `
-            <div style="margin-top: 2rem;">
-                <div class="info-label">Example Code</div>
+            <div class="mt-4">
+                <div class="text-uppercase small text-muted fw-semibold mb-2">Example Code</div>
                 <div class="code-block">
                     <code>// Subscribe and consume
 consumer.subscribe(['events']);

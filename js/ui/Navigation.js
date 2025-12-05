@@ -1,19 +1,25 @@
 /**
  * Navigation - Lesson navigation sidebar
  * Handles lesson selection and progress tracking
+ * Uses Bootstrap offcanvas for mobile and syncs both lesson lists
  */
 
 import { eventBus } from '../core/EventBus.js';
 
 export class Navigation {
     constructor() {
-        this.sidebar = document.getElementById('sidebar');
-        this.lessonList = document.getElementById('lessonList');
-        this.toggleBtn = document.getElementById('sidebarToggle');
-        this.mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        this.sidebarOverlay = document.getElementById('sidebarOverlay');
+        // Mobile offcanvas
+        this.offcanvasEl = document.getElementById('lessonsOffcanvas');
+        this.lessonListMobile = document.getElementById('lessonList');
+
+        // Desktop sidebar
+        this.lessonListDesktop = document.getElementById('lessonListDesktop');
+
+        // Bootstrap offcanvas instance (initialized after Bootstrap loads)
+        this.offcanvas = null;
+
         this.currentLesson = 'basics';
-        this.unlockedLessons = new Set(['basics', 'partitions', 'partitions-keys', 'consumer-groups', 'offsets', 'rebalancing']); // Unlock all lessons
+        this.unlockedLessons = new Set(['basics', 'partitions', 'partitions-keys', 'consumer-groups', 'offsets', 'rebalancing']);
 
         this.init();
     }
@@ -22,47 +28,40 @@ export class Navigation {
      * Initialize event listeners
      */
     init() {
-        // Unlock lessons in the UI
+        // Initialize Bootstrap offcanvas instance
+        if (typeof bootstrap !== 'undefined' && this.offcanvasEl) {
+            this.offcanvas = bootstrap.Offcanvas.getOrCreateInstance(this.offcanvasEl);
+        }
+
+        // Unlock lessons in both lists
         this.unlockedLessons.forEach(lessonId => {
-            const lessonItem = this.lessonList.querySelector(`[data-lesson="${lessonId}"]`);
-            if (lessonItem) {
-                lessonItem.classList.remove('locked');
-            }
+            this.updateLessonLockState(lessonId, false);
         });
 
         // Set initial active lesson indicator
-        const activeItem = this.lessonList.querySelector(`[data-lesson="${this.currentLesson}"]`);
-        if (activeItem) {
-            const status = activeItem.querySelector('.lesson-status');
-            if (status) {
-                status.textContent = '●';
-                status.style.color = 'var(--color-success)';
-            }
+        this.setActiveIndicator(this.currentLesson);
+
+        // Lesson item clicks - Mobile list
+        if (this.lessonListMobile) {
+            this.lessonListMobile.addEventListener('click', (e) => {
+                const lessonItem = e.target.closest('.kafka-lesson-item');
+                if (lessonItem && !lessonItem.classList.contains('locked')) {
+                    const lessonId = lessonItem.dataset.lesson;
+                    this.selectLesson(lessonId);
+                }
+            });
         }
 
-        // Toggle sidebar (desktop)
-        this.toggleBtn.addEventListener('click', () => {
-            this.toggleSidebar();
-        });
-
-        // Mobile menu button
-        this.mobileMenuBtn.addEventListener('click', () => {
-            this.openMobileSidebar();
-        });
-
-        // Close sidebar when clicking overlay
-        this.sidebarOverlay.addEventListener('click', () => {
-            this.closeMobileSidebar();
-        });
-
-        // Lesson item clicks
-        this.lessonList.addEventListener('click', (e) => {
-            const lessonItem = e.target.closest('.lesson-item');
-            if (lessonItem && !lessonItem.classList.contains('locked')) {
-                const lessonId = lessonItem.dataset.lesson;
-                this.selectLesson(lessonId);
-            }
-        });
+        // Lesson item clicks - Desktop list
+        if (this.lessonListDesktop) {
+            this.lessonListDesktop.addEventListener('click', (e) => {
+                const lessonItem = e.target.closest('.kafka-lesson-item');
+                if (lessonItem && !lessonItem.classList.contains('locked')) {
+                    const lessonId = lessonItem.dataset.lesson;
+                    this.selectLesson(lessonId);
+                }
+            });
+        }
 
         // Listen for scene ready events to update description
         eventBus.on('scene:ready', (data) => {
@@ -76,33 +75,47 @@ export class Navigation {
     }
 
     /**
-     * Toggle sidebar open/closed (desktop)
+     * Update lesson lock state in both lists
+     * @param {string} lessonId
+     * @param {boolean} locked
      */
-    toggleSidebar() {
-        this.sidebar.classList.toggle('collapsed');
+    updateLessonLockState(lessonId, locked) {
+        [this.lessonListMobile, this.lessonListDesktop].forEach(list => {
+            if (!list) return;
+            const item = list.querySelector(`[data-lesson="${lessonId}"]`);
+            if (item) {
+                if (locked) {
+                    item.classList.add('locked');
+                } else {
+                    item.classList.remove('locked');
+                }
+            }
+        });
     }
 
     /**
-     * Open sidebar on mobile
+     * Set active indicator on a lesson in both lists
+     * @param {string} lessonId
      */
-    openMobileSidebar() {
-        this.sidebar.classList.add('open');
-        this.sidebarOverlay.classList.add('visible');
-    }
-
-    /**
-     * Close sidebar on mobile
-     */
-    closeMobileSidebar() {
-        this.sidebar.classList.remove('open');
-        this.sidebarOverlay.classList.remove('visible');
+    setActiveIndicator(lessonId) {
+        [this.lessonListMobile, this.lessonListDesktop].forEach(list => {
+            if (!list) return;
+            const item = list.querySelector(`[data-lesson="${lessonId}"]`);
+            if (item) {
+                const status = item.querySelector('.kafka-lesson-status');
+                if (status) {
+                    status.textContent = '●';
+                    status.style.color = 'var(--color-success)';
+                }
+            }
+        });
     }
 
     /**
      * Check if we're on mobile viewport
      */
     isMobile() {
-        return window.innerWidth <= 1024;
+        return window.innerWidth < 992; // Bootstrap lg breakpoint
     }
 
     /**
@@ -114,31 +127,32 @@ export class Navigation {
             return; // Lesson is locked
         }
 
-        // Update UI
-        const items = this.lessonList.querySelectorAll('.lesson-item');
-        items.forEach(item => {
-            const status = item.querySelector('.lesson-status');
-            if (item.dataset.lesson === lessonId) {
-                item.classList.add('active');
-                // Add green dot for active lesson
-                if (status) {
-                    status.textContent = '●';
-                    status.style.color = 'var(--color-success)';
+        // Update UI in both lists
+        [this.lessonListMobile, this.lessonListDesktop].forEach(list => {
+            if (!list) return;
+            const items = list.querySelectorAll('.kafka-lesson-item');
+            items.forEach(item => {
+                const status = item.querySelector('.kafka-lesson-status');
+                if (item.dataset.lesson === lessonId) {
+                    item.classList.add('active');
+                    if (status) {
+                        status.textContent = '●';
+                        status.style.color = 'var(--color-success)';
+                    }
+                } else {
+                    item.classList.remove('active');
+                    if (status && !status.textContent.includes('✓')) {
+                        status.textContent = '';
+                    }
                 }
-            } else {
-                item.classList.remove('active');
-                // Remove dot from inactive lessons
-                if (status && !status.textContent.includes('✓')) {
-                    status.textContent = '';
-                }
-            }
+            });
         });
 
         this.currentLesson = lessonId;
 
-        // Close sidebar on mobile after selecting lesson
-        if (this.isMobile()) {
-            this.closeMobileSidebar();
+        // Close offcanvas on mobile after selecting lesson
+        if (this.isMobile() && this.offcanvas) {
+            this.offcanvas.hide();
         }
 
         // Emit event for scene change
@@ -157,21 +171,21 @@ export class Navigation {
             const nextLesson = lessons[currentIndex + 1];
             this.unlockedLessons.add(nextLesson);
 
-            // Update UI
-            const nextItem = this.lessonList.querySelector(`[data-lesson="${nextLesson}"]`);
-            if (nextItem) {
-                nextItem.classList.remove('locked');
-            }
+            // Update UI - unlock next lesson
+            this.updateLessonLockState(nextLesson, false);
 
-            // Mark current as complete
-            const currentItem = this.lessonList.querySelector(`[data-lesson="${completedLessonId}"]`);
-            if (currentItem) {
-                const status = currentItem.querySelector('.lesson-status');
-                if (status) {
-                    status.textContent = '✓';
-                    status.style.color = 'var(--color-success)';
+            // Mark current as complete in both lists
+            [this.lessonListMobile, this.lessonListDesktop].forEach(list => {
+                if (!list) return;
+                const currentItem = list.querySelector(`[data-lesson="${completedLessonId}"]`);
+                if (currentItem) {
+                    const status = currentItem.querySelector('.kafka-lesson-status');
+                    if (status) {
+                        status.textContent = '✓';
+                        status.style.color = 'var(--color-success)';
+                    }
                 }
-            }
+            });
         }
     }
 
@@ -181,8 +195,8 @@ export class Navigation {
      */
     updateLessonDescription(data) {
         const descriptionEl = document.getElementById('lessonDescription');
-        const titleEl = descriptionEl.querySelector('.lesson-title');
-        const textEl = descriptionEl.querySelector('.lesson-text');
+        const titleEl = descriptionEl?.querySelector('.kafka-lesson-title');
+        const textEl = descriptionEl?.querySelector('.kafka-lesson-text');
 
         if (titleEl) titleEl.textContent = data.title;
         if (textEl) textEl.textContent = data.description;
