@@ -1,278 +1,7 @@
 /* ============================================
    Kafka Flow Visualizer - Component Styles
-   Buttons, controls, panels, cards
+   Custom components that extend Bootstrap
    ============================================ */
-
-/* ============================================
-   Control Panel (Floating)
-   ============================================ */
-
-.controls {
-    position: fixed;
-    bottom: var(--spacing-xl);
-    right: var(--spacing-xl);
-    background-color: rgba(30, 36, 30, 0.95);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-md) var(--spacing-lg);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    box-shadow: var(--shadow-xl);
-    z-index: 90;
-    transition: all var(--transition-base);
-}
-
-.controls:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 24px 32px -6px rgba(0, 0, 0, 0.7), 0 12px 14px -6px rgba(0, 0, 0, 0.5);
-}
-
-.controls.inactive {
-    opacity: 0.6;
-}
-
-/* Control Buttons */
-.control-btn {
-    width: 40px;
-    height: 40px;
-    border: none;
-    background-color: var(--bg-surface-light);
-    color: var(--text-secondary);
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    position: relative;
-}
-
-.control-btn:hover {
-    background-color: var(--border-color);
-    color: var(--text-primary);
-    transform: scale(1.05);
-}
-
-.control-btn:active {
-    transform: scale(0.95);
-}
-
-.control-btn-primary {
-    background: linear-gradient(135deg, var(--color-topic-end), var(--color-producer-end));
-    color: white;
-}
-
-.control-btn-primary:hover {
-    background: linear-gradient(135deg, var(--color-topic-start), var(--color-producer-start));
-    box-shadow: 0 0 24px rgba(123, 158, 123, 0.35);
-}
-
-.control-divider {
-    width: 1px;
-    height: 24px;
-    background-color: var(--border-color);
-}
-
-/* Speed Control */
-.speed-control {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-}
-
-.speed-control label {
-    font-weight: 500;
-}
-
-#speedSlider {
-    width: 100px;
-    height: 4px;
-    border-radius: var(--radius-sm);
-    background: var(--bg-surface-light);
-    outline: none;
-    -webkit-appearance: none;
-}
-
-#speedSlider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-topic-start), var(--color-producer-start));
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition-fast);
-}
-
-#speedSlider::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
-    box-shadow: 0 0 16px rgba(123, 158, 123, 0.5);
-}
-
-#speedSlider::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-topic-start), var(--color-producer-start));
-    cursor: pointer;
-    border: none;
-    box-shadow: var(--shadow-sm);
-}
-
-#speedValue {
-    min-width: 32px;
-    text-align: center;
-    font-weight: 600;
-    color: var(--text-primary);
-    font-family: var(--font-mono);
-}
-
-/* ============================================
-   Info Panel (Slide-in)
-   ============================================ */
-
-.info-panel {
-    position: fixed;
-    top: 73px; /* Height of header */
-    right: 0;
-    bottom: 0;
-    width: 400px;
-    background-color: var(--bg-surface);
-    border-left: 1px solid var(--border-color);
-    box-shadow: var(--shadow-xl);
-    transform: translateX(100%);
-    transition: transform var(--transition-slow);
-    z-index: 95;
-    overflow-y: auto;
-}
-
-.info-panel.open {
-    transform: translateX(0);
-}
-
-.info-panel-close {
-    position: absolute;
-    top: var(--spacing-lg);
-    right: var(--spacing-lg);
-    width: 32px;
-    height: 32px;
-    border: none;
-    background-color: var(--bg-surface-light);
-    color: var(--text-secondary);
-    border-radius: var(--radius-md);
-    font-size: 1.5rem;
-    line-height: 1;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.info-panel-close:hover {
-    background-color: var(--border-color);
-    color: var(--text-primary);
-    transform: rotate(90deg);
-}
-
-.info-panel-content {
-    padding: var(--spacing-2xl);
-    padding-top: calc(var(--spacing-2xl) + 48px); /* Space for close button */
-}
-
-.info-panel-content h3 {
-    margin-bottom: var(--spacing-md);
-    color: var(--text-primary);
-}
-
-.info-panel-content p {
-    margin-bottom: var(--spacing-lg);
-    line-height: 1.7;
-}
-
-.info-panel-content .info-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-muted);
-    margin-bottom: var(--spacing-xs);
-    font-weight: 600;
-}
-
-.info-panel-content .info-value {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-lg);
-    font-family: var(--font-mono);
-}
-
-/* ============================================
-   Cards & Boxes
-   ============================================ */
-
-.card {
-    background-color: var(--bg-surface-light);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    margin-bottom: var(--spacing-md);
-    transition: all var(--transition-base);
-}
-
-.card:hover {
-    border-color: var(--bg-surface-light);
-    box-shadow: var(--shadow-md);
-}
-
-.card-title {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: var(--spacing-sm);
-    color: var(--text-primary);
-}
-
-.card-text {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    line-height: 1.6;
-}
-
-/* ============================================
-   Badges & Tags
-   ============================================ */
-
-.badge {
-    display: inline-flex;
-    align-items: center;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    background-color: var(--bg-surface-light);
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.badge-producer {
-    background: linear-gradient(135deg, rgba(194, 120, 92, 0.2), rgba(166, 93, 66, 0.2));
-    color: var(--color-producer-start);
-}
-
-.badge-topic {
-    background: linear-gradient(135deg, rgba(123, 158, 123, 0.2), rgba(92, 122, 92, 0.2));
-    color: var(--color-topic-start);
-}
-
-.badge-consumer {
-    background: linear-gradient(135deg, rgba(107, 158, 158, 0.2), rgba(74, 122, 122, 0.2));
-    color: var(--color-consumer-start);
-}
 
 /* ============================================
    Code Blocks
@@ -297,15 +26,34 @@
 }
 
 /* ============================================
-   Tooltips
+   Badges - Kafka Component Types
    ============================================ */
 
-.tooltip {
+.badge-producer {
+    background: linear-gradient(135deg, rgba(194, 120, 92, 0.2), rgba(166, 93, 66, 0.2)) !important;
+    color: var(--color-producer-start) !important;
+}
+
+.badge-topic {
+    background: linear-gradient(135deg, rgba(123, 158, 123, 0.2), rgba(92, 122, 92, 0.2)) !important;
+    color: var(--color-topic-start) !important;
+}
+
+.badge-consumer {
+    background: linear-gradient(135deg, rgba(107, 158, 158, 0.2), rgba(74, 122, 122, 0.2)) !important;
+    color: var(--color-consumer-start) !important;
+}
+
+/* ============================================
+   Tooltips (Custom)
+   ============================================ */
+
+.tooltip-custom {
     position: relative;
     display: inline-block;
 }
 
-.tooltip-text {
+.tooltip-custom-text {
     visibility: hidden;
     position: absolute;
     bottom: 125%;
@@ -322,7 +70,7 @@
     z-index: 1000;
 }
 
-.tooltip:hover .tooltip-text {
+.tooltip-custom:hover .tooltip-custom-text {
     visibility: visible;
     animation: fadeIn 0.2s ease-in;
 }
@@ -342,7 +90,7 @@
    Loading State
    ============================================ */
 
-.loading {
+.loading-spinner {
     display: inline-block;
     width: 20px;
     height: 20px;
@@ -355,35 +103,5 @@
 @keyframes spin {
     to {
         transform: rotate(360deg);
-    }
-}
-
-/* ============================================
-   Responsive Components
-   ============================================ */
-
-@media (max-width: 768px) {
-    .controls {
-        bottom: var(--spacing-md);
-        right: var(--spacing-md);
-        left: var(--spacing-md);
-        padding: var(--spacing-sm) var(--spacing-md);
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .speed-control {
-        width: 100%;
-        justify-content: center;
-        margin-top: var(--spacing-sm);
-    }
-
-    .info-panel {
-        width: 100%;
-        max-width: 400px;
-    }
-
-    .card {
-        padding: var(--spacing-md);
     }
 }
