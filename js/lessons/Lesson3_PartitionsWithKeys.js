@@ -390,8 +390,8 @@ export class Lesson3_PartitionsWithKeys extends Scene {
             this.addElement(`load-label-${i}`, label);
 
             const barBg = this.createRect(x + 34, rowY, width - 60, 12, {
-                fill: '#111831',
-                stroke: '#1E293B',
+                fill: '#1E241E',
+                stroke: '#282F28',
                 'stroke-width': 1,
                 rx: 6,
                 opacity: 0.8
