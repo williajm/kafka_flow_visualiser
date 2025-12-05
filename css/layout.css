@@ -57,6 +57,26 @@
     transform: translateY(-1px);
 }
 
+/* Mobile Menu Button - Hidden on desktop */
+.mobile-menu-btn {
+    display: none;
+    width: 40px;
+    height: 40px;
+    background-color: var(--bg-surface-light);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-base);
+}
+
+.mobile-menu-btn:hover {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+}
+
 /* ============================================
    Main Container Layout
    ============================================ */
@@ -263,6 +283,10 @@
    ============================================ */
 
 @media (max-width: 1024px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+
     .container {
         grid-template-columns: 1fr;
     }
@@ -280,6 +304,25 @@
 
     .sidebar.open {
         transform: translateX(0);
+    }
+
+    .sidebar-toggle {
+        display: none;
+    }
+
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 40;
+    }
+
+    .sidebar-overlay.visible {
+        display: block;
     }
 
     .lesson-description {

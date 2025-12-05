@@ -10,6 +10,8 @@ export class Navigation {
         this.sidebar = document.getElementById('sidebar');
         this.lessonList = document.getElementById('lessonList');
         this.toggleBtn = document.getElementById('sidebarToggle');
+        this.mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        this.sidebarOverlay = document.getElementById('sidebarOverlay');
         this.currentLesson = 'basics';
         this.unlockedLessons = new Set(['basics', 'partitions', 'partitions-keys', 'consumer-groups', 'offsets', 'rebalancing']); // Unlock all lessons
 
@@ -38,9 +40,19 @@ export class Navigation {
             }
         }
 
-        // Toggle sidebar
+        // Toggle sidebar (desktop)
         this.toggleBtn.addEventListener('click', () => {
             this.toggleSidebar();
+        });
+
+        // Mobile menu button
+        this.mobileMenuBtn.addEventListener('click', () => {
+            this.openMobileSidebar();
+        });
+
+        // Close sidebar when clicking overlay
+        this.sidebarOverlay.addEventListener('click', () => {
+            this.closeMobileSidebar();
         });
 
         // Lesson item clicks
@@ -64,10 +76,33 @@ export class Navigation {
     }
 
     /**
-     * Toggle sidebar open/closed
+     * Toggle sidebar open/closed (desktop)
      */
     toggleSidebar() {
         this.sidebar.classList.toggle('collapsed');
+    }
+
+    /**
+     * Open sidebar on mobile
+     */
+    openMobileSidebar() {
+        this.sidebar.classList.add('open');
+        this.sidebarOverlay.classList.add('visible');
+    }
+
+    /**
+     * Close sidebar on mobile
+     */
+    closeMobileSidebar() {
+        this.sidebar.classList.remove('open');
+        this.sidebarOverlay.classList.remove('visible');
+    }
+
+    /**
+     * Check if we're on mobile viewport
+     */
+    isMobile() {
+        return window.innerWidth <= 1024;
     }
 
     /**
@@ -100,6 +135,11 @@ export class Navigation {
         });
 
         this.currentLesson = lessonId;
+
+        // Close sidebar on mobile after selecting lesson
+        if (this.isMobile()) {
+            this.closeMobileSidebar();
+        }
 
         // Emit event for scene change
         eventBus.emit('navigation:lessonChange', lessonId);
