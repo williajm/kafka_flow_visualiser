@@ -278,19 +278,6 @@ export class Lesson3_PartitionsWithKeys extends Scene {
             }
         );
         this.addElement('legend-note-1', note1);
-
-        const note2 = this.createText(
-            'Numbers in ( ) = global order - notice out of sequence!',
-            x,
-            y + 90,
-            {
-                'font-size': '8',
-                'fill': '#7A756C',
-                'text-anchor': 'start',
-                'font-style': 'italic'
-            }
-        );
-        this.addElement('legend-note-2', note2);
     }
 
     /**
@@ -407,18 +394,6 @@ export class Lesson3_PartitionsWithKeys extends Scene {
             });
             this.addElement(`load-bar-fill-${i}`, barFill);
         });
-
-        const note = this.createText(
-            'Key-based routing may cause uneven distribution if keys aren\'t balanced.',
-            x + width / 2,
-            y + height - 10,
-            {
-                'font-size': '9',
-                'fill': '#B5AFA5',
-                'text-anchor': 'middle'
-            }
-        );
-        this.addElement('load-note', note);
     }
 
     /**

@@ -319,18 +319,6 @@ export class Lesson2_Partitions extends Scene {
             });
             this.addElement(`load-bar-fill-${i}`, barFill);
         });
-
-        const note = this.createText(
-            'Partitions distribute load across brokers. Key-based routing may cause uneven distribution.',
-            x + width / 2,
-            y + height - 10,
-            {
-                'font-size': '9',
-                'fill': '#B5AFA5',
-                'text-anchor': 'middle'
-            }
-        );
-        this.addElement('load-note', note);
     }
 
     /**
