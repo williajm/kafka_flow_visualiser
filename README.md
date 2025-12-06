@@ -13,18 +13,17 @@ An interactive, beautiful web-based visualization tool for learning Apache Kafka
 - **Playback Controls**: Play, pause, reset, and adjust animation speed
 - **Modern Design**: Dark mode aesthetic with polished UI
 - **Mobile Responsive**: Works on desktop and mobile devices
-- **No Backend Required**: Pure client-side application, perfect for GitHub Pages
+- **No Backend Required**: Pure client-side application
 
 ## Lessons
 
-### Currently Available
 1. **The Basics** - Learn the fundamental Producer → Topic → Consumer flow
-
-### Coming Soon
 2. **Partitions** - Understand how messages distribute across partitions
-3. **Consumer Groups** - See how multiple consumers work together
-4. **Offsets & Lag** - Visualize offset tracking and consumer lag
-5. **Rebalancing** - Watch what happens when consumers join/leave
+3. **Partitions with Keys** - See how message keys ensure ordering
+4. **Sticky Partitioner** - Learn about partition batching strategies
+5. **Consumer Groups** - See how multiple consumers work together
+6. **Offsets & Lag** - Visualize offset tracking and consumer lag
+7. **Rebalancing** - Watch what happens when consumers join/leave
 
 ## Technology Stack
 
@@ -52,9 +51,16 @@ kafka-flow-visualizer/
 │   │   ├── Producer.js    # Producer visualization
 │   │   ├── Topic.js       # Topic visualization
 │   │   ├── Consumer.js    # Consumer visualization
-│   │   └── Message.js     # Message entity
+│   │   ├── Message.js     # Message entity
+│   │   └── Broker.js      # Broker visualization
 │   ├── lessons/
-│   │   └── Lesson1_Basics.js
+│   │   ├── Lesson1_Basics.js
+│   │   ├── Lesson2_Partitions.js
+│   │   ├── Lesson3_PartitionsWithKeys.js
+│   │   ├── Lesson4_PartitionerStrategies.js
+│   │   ├── Lesson5_ConsumerGroups.js
+│   │   ├── Lesson6_Offsets.js
+│   │   └── Lesson7_Rebalancing.js
 │   └── ui/
 │       ├── Controls.js    # Playback controls
 │       ├── InfoPanel.js   # Information sidebar
@@ -121,10 +127,10 @@ registerLessons() {
 
 ### Color Palette
 
-- **Producers**: Violet gradient (#8B5CF6 → #A78BFA)
-- **Topics**: Blue gradient (#3B82F6 → #60A5FA)
-- **Consumers**: Emerald gradient (#10B981 → #34D399)
-- **Messages**: Warm amber (#FBBF24) - stands out as data in motion
+- **Producers**: Terra cotta (#C2785C → #A65D42)
+- **Topics**: Sage green (#7B9E7B → #5C7A5C)
+- **Consumers**: Teal (#6B9E9E → #4A7A7A)
+- **Messages**: Warm amber (#D4A855) - stands out as data in motion
 
 ### Animation Principles
 
