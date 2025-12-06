@@ -19,7 +19,7 @@ export class Lesson2_Partitions extends Scene {
     constructor(canvas) {
         super(canvas, {
             title: 'Kafka Partitions Explained',
-            description: 'Partitions divide topics across brokers for scalability. Messages distribute round-robin across partitions for even load distribution. Each partition maintains order, and a single consumer can read from all partitions.'
+            description: 'Partitions divide topics across brokers for scalability. This lesson demonstrates round-robin distribution of unkeyed messages across partitions. Each partition maintains strict ordering, and a single consumer can read from multiple partitions.'
         });
 
         this.producer = null;
@@ -372,7 +372,7 @@ export class Lesson2_Partitions extends Scene {
         if (producerEl) {
             producerEl.addEventListener('click', () => {
                 const info = this.producer.getInfo();
-                info.description += ` Messages distribute round-robin across all partitions for even load distribution.`;
+                info.description += ` This lesson uses round-robin distribution to evenly spread messages across partitions.`;
                 eventBus.emit('entity:click', info);
             });
         }

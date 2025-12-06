@@ -10,9 +10,10 @@ import { Navigation } from './ui/Navigation.js';
 import { Lesson1_Basics } from './lessons/Lesson1_Basics.js';
 import { Lesson2_Partitions } from './lessons/Lesson2_Partitions.js';
 import { Lesson3_PartitionsWithKeys } from './lessons/Lesson3_PartitionsWithKeys.js';
-import { Lesson4_ConsumerGroups } from './lessons/Lesson4_ConsumerGroups.js';
-import { Lesson5_Offsets } from './lessons/Lesson5_Offsets.js';
-import { Lesson6_Rebalancing } from './lessons/Lesson6_Rebalancing.js';
+import { Lesson4_PartitionerStrategies } from './lessons/Lesson4_PartitionerStrategies.js';
+import { Lesson5_ConsumerGroups } from './lessons/Lesson5_ConsumerGroups.js';
+import { Lesson6_Offsets } from './lessons/Lesson6_Offsets.js';
+import { Lesson7_Rebalancing } from './lessons/Lesson7_Rebalancing.js';
 import { Broker } from './kafka/Broker.js';
 
 class KafkaFlowVisualizer {
@@ -52,9 +53,10 @@ class KafkaFlowVisualizer {
         this.lessons.set('basics', Lesson1_Basics);
         this.lessons.set('partitions', Lesson2_Partitions);
         this.lessons.set('partitions-keys', Lesson3_PartitionsWithKeys);
-        this.lessons.set('consumer-groups', Lesson4_ConsumerGroups);
-        this.lessons.set('offsets', Lesson5_Offsets);
-        this.lessons.set('rebalancing', Lesson6_Rebalancing);
+        this.lessons.set('partitioner-strategies', Lesson4_PartitionerStrategies);
+        this.lessons.set('consumer-groups', Lesson5_ConsumerGroups);
+        this.lessons.set('offsets', Lesson6_Offsets);
+        this.lessons.set('rebalancing', Lesson7_Rebalancing);
     }
 
     /**

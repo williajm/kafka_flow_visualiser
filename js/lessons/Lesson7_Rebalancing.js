@@ -1,5 +1,5 @@
 /**
- * Lesson 6: Consumer Group Rebalancing
+ * Lesson 7: Consumer Group Rebalancing
  * Demonstrates:
  * - What happens when consumers join a group
  * - What happens when consumers leave a group
@@ -14,7 +14,7 @@ import { Consumer } from '../kafka/Consumer.js';
 import { Message } from '../kafka/Message.js';
 import { eventBus } from '../core/EventBus.js';
 
-export class Lesson6_Rebalancing extends Scene {
+export class Lesson7_Rebalancing extends Scene {
     constructor(canvas) {
         super(canvas, {
             title: 'Consumer Group Rebalancing',
@@ -500,7 +500,7 @@ export class Lesson6_Rebalancing extends Scene {
         if (producerEl) {
             producerEl.addEventListener('click', () => {
                 const info = this.producer.getInfo();
-                info.description += ` Messages distribute round-robin across all partitions.`;
+                info.description += ` This lesson uses round-robin distribution to spread messages across partitions.`;
                 eventBus.emit('entity:click', info);
             });
         }

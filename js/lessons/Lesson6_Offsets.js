@@ -1,5 +1,5 @@
 /**
- * Lesson 5: Offsets & Lag
+ * Lesson 6: Offsets & Lag
  * Demonstrates:
  * - Offsets as position markers in partitions
  * - Consumer offset tracking
@@ -14,7 +14,7 @@ import { Consumer } from '../kafka/Consumer.js';
 import { Message } from '../kafka/Message.js';
 import { eventBus } from '../core/EventBus.js';
 
-export class Lesson5_Offsets extends Scene {
+export class Lesson6_Offsets extends Scene {
     constructor(canvas) {
         super(canvas, {
             title: 'Kafka Offsets & Consumer Lag',

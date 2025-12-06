@@ -1,5 +1,5 @@
 /**
- * Lesson 4: Consumer Groups
+ * Lesson 5: Consumer Groups
  * Demonstrates:
  * - Multiple consumers in the same consumer group
  * - Partition assignment to consumers (each partition → one consumer)
@@ -14,7 +14,7 @@ import { Consumer } from '../kafka/Consumer.js';
 import { Message } from '../kafka/Message.js';
 import { eventBus } from '../core/EventBus.js';
 
-export class Lesson4_ConsumerGroups extends Scene {
+export class Lesson5_ConsumerGroups extends Scene {
     constructor(canvas) {
         super(canvas, {
             title: 'Kafka Consumer Groups',
@@ -410,7 +410,7 @@ export class Lesson4_ConsumerGroups extends Scene {
         if (producerEl) {
             producerEl.addEventListener('click', () => {
                 const info = this.producer.getInfo();
-                info.description += ` Messages distribute round-robin across all partitions.`;
+                info.description += ` This lesson uses round-robin distribution to spread messages across partitions.`;
                 eventBus.emit('entity:click', info);
             });
         }
