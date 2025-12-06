@@ -19,7 +19,7 @@ export class Navigation {
         this.offcanvas = null;
 
         this.currentLesson = 'basics';
-        this.unlockedLessons = new Set(['basics', 'partitions', 'partitions-keys', 'consumer-groups', 'offsets', 'rebalancing']);
+        this.unlockedLessons = new Set(['basics', 'partitions', 'partitions-keys', 'partitioner-strategies', 'consumer-groups', 'offsets', 'rebalancing']);
 
         this.init();
     }
@@ -164,7 +164,7 @@ export class Navigation {
      * @param {string} completedLessonId
      */
     unlockNextLesson(completedLessonId) {
-        const lessons = ['basics', 'partitions', 'partitions-keys', 'consumer-groups', 'offsets', 'rebalancing'];
+        const lessons = ['basics', 'partitions', 'partitions-keys', 'partitioner-strategies', 'consumer-groups', 'offsets', 'rebalancing'];
         const currentIndex = lessons.indexOf(completedLessonId);
 
         if (currentIndex >= 0 && currentIndex < lessons.length - 1) {

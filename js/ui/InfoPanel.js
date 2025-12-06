@@ -145,7 +145,7 @@ producer.send({
                 <div class="text-uppercase small text-muted fw-semibold mb-2">Example Code</div>
                 <div class="code-block">
                     <code>// Subscribe and consume
-consumer.subscribe(['events']);
+await consumer.subscribe({ topic: 'events' });
 
 await consumer.run({
   eachMessage: async ({ message }) => {
